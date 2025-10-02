@@ -1,0 +1,48 @@
+# Archivos de compilación Java/Maven
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.ear
+backend/*.class
+backend/*.log
+
+# Archivos de Node.js
+frontend/frontend-app/node_modules/
+frontend/frontend-app/dist/
+frontend/frontend-app/.angular/
+frontend/frontend-app/coverage/
+frontend/frontend-app/*.log
+
+# Archivos de IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# Archivos de configuración local (opcional)
+# backend/src/main/resources/application-local.properties
+
+# Logs
+*.log
+logs/
+
+# Archivos de base de datos local
+*.db
+*.sqlite
+
+# Archivos de backup
+*.bak
+*.backup
+
+# NOTA: Los scripts .sh y .bat SÍ se incluyen en el repositorio
+# para facilitar el despliegue en diferentes entornos
