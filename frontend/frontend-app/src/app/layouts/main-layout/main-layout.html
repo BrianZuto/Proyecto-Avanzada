@@ -1,0 +1,66 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <!-- Logo -->
+    <div class="logo">
+      <h1>SneakerZone</h1>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+      <a href="#" class="nav-link">Inicio</a>
+      <a href="#" class="nav-link">Hombres</a>
+      <a href="#" class="nav-link">Mujeres</a>
+      <a href="#" class="nav-link">Niños</a>
+      <a href="#" class="nav-link">Ofertas</a>
+    </nav>
+
+    <!-- Search and Icons -->
+    <div class="header-actions">
+      <div class="search-bar">
+        <input type="text" placeholder="Buscar sneakers..." class="search-input">
+        <i class="bi bi-search search-icon icon-white"></i>
+      </div>
+      <div class="header-icons">
+        <div class="user-dropdown" (click)="toggleUserDropdown()">
+          <i class="bi bi-person icon user-icon icon-white"></i>
+          <div class="dropdown-menu" [class.show]="showUserDropdown">
+            <div *ngIf="!isLoggedIn()" class="dropdown-item" (click)="goToLogin()">
+              <i class="bi bi-box-arrow-in-right dropdown-icon"></i>
+              Iniciar Sesión
+            </div>
+            <div *ngIf="!isLoggedIn()" class="dropdown-item" (click)="goToRegister()">
+              <i class="bi bi-person-plus dropdown-icon"></i>
+              Registrarse
+            </div>
+            <div *ngIf="isLoggedIn()" class="dropdown-item" (click)="goToProfile()">
+              <i class="bi bi-person-circle dropdown-icon"></i>
+              Mi Perfil
+            </div>
+            <div *ngIf="isLoggedIn()" class="dropdown-item" (click)="logout()">
+              <i class="bi bi-box-arrow-right dropdown-icon"></i>
+              Cerrar Sesión
+            </div>
+          </div>
+        </div>
+        <i class="bi bi-cart3 icon icon-white"></i>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Content Area -->
+<div class="content-wrapper">
+  <ng-content></ng-content>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <p class="footer-text">
+        © 2025 SneakerZone - Proyecto para la asignatura Programación Avanzada
+      </p>
+    </div>
+  </div>
+</footer>

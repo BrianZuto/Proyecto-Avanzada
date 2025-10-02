@@ -1,0 +1,14 @@
+com\proyectoavanzada\backend\controller\AuthController$PasswordHashRequest.class
+com\proyectoavanzada\backend\controller\AuthController$RegisterRequest.class
+com\proyectoavanzada\backend\controller\TestController.class
+com\proyectoavanzada\backend\model\Usuario.class
+com\proyectoavanzada\backend\controller\AuthController.class
+com\proyectoavanzada\backend\service\UsuarioService.class
+com\proyectoavanzada\backend\BackendApplication.class
+com\proyectoavanzada\backend\config\SecurityConfig.class
+com\proyectoavanzada\backend\controller\AuthController$EmailCheckRequest.class
+com\proyectoavanzada\backend\config\CorsConfig.class
+com\proyectoavanzada\backend\repository\UsuarioRepository.class
+com\proyectoavanzada\backend\controller\UsuarioController.class
+com\proyectoavanzada\backend\controller\AuthController$LoginRequest.class
+com\proyectoavanzada\backend\util\PasswordUtil.class

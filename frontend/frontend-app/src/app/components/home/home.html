@@ -1,0 +1,99 @@
+<app-main-layout>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="badge">Nueva Colección</span>
+        <h2 class="hero-title">
+          Los Mejores <span class="highlight">Sneakers</span> para Ti
+        </h2>
+        <p class="hero-description">
+          Descubre nuestra colección exclusiva de sneakers de las mejores marcas.
+          Calidad premium, estilo único y comodidad incomparable.
+        </p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary" (click)="explorarColeccion()">Explorar Colección</button>
+          <button class="btn btn-secondary" (click)="verOfertas()">Ver Ofertas</button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=400&fit=crop"
+             alt="Sneaker destacado" class="featured-sneaker">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-number">500+</div>
+      <div class="stat-label">Modelos disponibles</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">24/7</div>
+      <div class="stat-label">Soporte al cliente</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">Envío</div>
+      <div class="stat-label">Gratis nacional</div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="featured-products">
+  <div class="products-container">
+    <div class="section-header">
+      <h3 class="section-title">Productos Destacados</h3>
+      <p class="section-subtitle">Encuentra los sneakers perfectos para tu estilo y personalidad</p>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs">
+      <button class="tab" [class.active]="categoriaActiva === 'Todos'" (click)="cambiarCategoria('Todos')">Todos</button>
+      <button class="tab" [class.active]="categoriaActiva === 'Nike'" (click)="cambiarCategoria('Nike')">Nike</button>
+      <button class="tab" [class.active]="categoriaActiva === 'Adidas'" (click)="cambiarCategoria('Adidas')">Adidas</button>
+      <button class="tab" [class.active]="categoriaActiva === 'Puma'" (click)="cambiarCategoria('Puma')">Puma</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let producto of productos">
+        <div class="product-badge" [class.discount]="producto.badge === 'discount'" [class.new]="producto.badge === 'new'">
+          {{ producto.badge === 'discount' ? '-' + producto.descuento + '%' : 'Nuevo' }}
+        </div>
+        <div class="product-image">
+          <img [src]="producto.imagen" [alt]="producto.modelo">
+        </div>
+        <div class="product-info">
+          <div class="product-brand">{{ producto.marca }}</div>
+          <div class="product-model">{{ producto.modelo }}</div>
+          <div class="product-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-text">{{ producto.rating }} ({{ producto.reviews }})</span>
+          </div>
+          <div class="product-price">
+            <span class="current-price">${{ producto.precio | number:'1.0-0' }}</span>
+            <span class="original-price" *ngIf="producto.precioOriginal">${{ producto.precioOriginal | number:'1.0-0' }}</span>
+          </div>
+          <div class="product-sizes">
+            <button class="size-btn" *ngFor="let talla of producto.tallas" (click)="seleccionarTalla(producto.id, talla)">
+              {{ talla }}
+            </button>
+            <button class="size-btn more" *ngIf="producto.tallas.length > 6">+{{ producto.tallas.length - 6 }} más</button>
+          </div>
+          <div class="product-colors">
+            <div class="color-swatch" *ngFor="let color of producto.colores" [class]="color"></div>
+          </div>
+          <button class="product-btn" (click)="agregarAlCarrito(producto.id)">Selecciona una talla</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</app-main-layout>

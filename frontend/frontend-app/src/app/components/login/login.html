@@ -1,0 +1,241 @@
+<div class="login-container">
+  <!-- Icono centrado -->
+  <div class="login-icon">
+    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  </div>
+
+  <!-- Contenido blanco -->
+  <div class="login-content">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'login'"
+        (click)="setActiveTab('login')">
+        Iniciar Sesión
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'register'"
+        (click)="setActiveTab('register')">
+        Registrarse
+      </button>
+    </div>
+
+    <!-- Formulario de Login -->
+    <div *ngIf="activeTab === 'login'" class="form-container">
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <!-- Email -->
+        <div class="form-group">
+          <label for="login-email">Correo electrónico</label>
+          <div class="input-container">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <input
+              type="email"
+              id="login-email"
+              name="email"
+              [(ngModel)]="loginData.email"
+              placeholder="tu@email.com"
+              required>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <div class="input-container">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <circle cx="12" cy="16" r="1"></circle>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              #loginPassword
+              type="password"
+              id="login-password"
+              name="password"
+              [(ngModel)]="loginData.password"
+              placeholder="••••••••"
+              required>
+            <svg
+              class="password-toggle"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              (click)="togglePasswordVisibility(loginPassword)">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Forgot Password -->
+        <div class="forgot-password">
+          <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="error-message">
+          {{ error }}
+        </div>
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="loading || !loginForm.form.valid">
+          <span *ngIf="!loading">Iniciar Sesión</span>
+          <span *ngIf="loading">Iniciando...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div *ngIf="activeTab === 'register'" class="form-container">
+      <form (ngSubmit)="onRegister()" #registerForm="ngForm">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="register-nombre">Nombre completo</label>
+          <div class="input-container">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <input
+              type="text"
+              id="register-nombre"
+              name="nombre"
+              [(ngModel)]="registerData.nombre"
+              placeholder="Tu nombre completo"
+              required>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="register-email">Correo electrónico</label>
+          <div class="input-container">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <input
+              type="email"
+              id="register-email"
+              name="email"
+              [(ngModel)]="registerData.email"
+              (blur)="checkEmailExists()"
+              (input)="checkEmailExists()"
+              placeholder="tu@email.com"
+              [class.error]="emailExists"
+              required>
+          </div>
+          <!-- Mensaje de validación del email -->
+          <div class="email-validation" *ngIf="registerData.email.length > 0">
+            <div class="validation-message" *ngIf="emailChecking">
+              <span class="checking">🔄 Verificando email...</span>
+            </div>
+            <div class="validation-message" *ngIf="!emailChecking && emailExists">
+              <span class="error">❌ Este email ya está registrado</span>
+            </div>
+            <div class="validation-message" *ngIf="!emailChecking && !emailExists && registerData.email.length >= 5">
+              <span class="success">✅ Email disponible</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <div class="input-container">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <circle cx="12" cy="16" r="1"></circle>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              #registerPassword
+              type="password"
+              id="register-password"
+              name="password"
+              [(ngModel)]="registerData.password"
+              placeholder="••••••••"
+              required>
+            <svg
+              class="password-toggle"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              (click)="togglePasswordVisibility(registerPassword)">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="register-confirm-password">Confirmar contraseña</label>
+          <div class="input-container">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <circle cx="12" cy="16" r="1"></circle>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              #registerConfirmPassword
+              type="password"
+              id="register-confirm-password"
+              name="confirmPassword"
+              [(ngModel)]="registerData.confirmPassword"
+              placeholder="••••••••"
+              required>
+            <svg
+              class="password-toggle"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              (click)="togglePasswordVisibility(registerConfirmPassword)">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="error-message">
+          {{ error }}
+        </div>
+
+        <!-- Register Button -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="loading || !isRegisterFormValid()">
+          <span *ngIf="!loading">Registrarse</span>
+          <span *ngIf="loading">Registrando...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms">
+      <p>Al continuar, aceptas nuestros <a href="#" class="terms-link">términos</a> y <a href="#" class="terms-link">privacidad</a></p>
+    </div>
+  </div>
+</div>

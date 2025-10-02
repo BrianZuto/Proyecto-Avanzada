@@ -1,0 +1,279 @@
+/* Aplicar tipografía amigable a todo el componente */
+.main-layout * {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: white;
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.logo h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #4ecdc4;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  padding: 0.7rem 1rem 0.7rem 2.5rem;
+  color: white;
+  font-size: 0.9rem;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #4ecdc4;
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+}
+
+.header-icons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.icon {
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  color: white;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+/* User Dropdown */
+.user-dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-icon {
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.user-icon:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.5rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-icon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  color: #6c757d;
+  margin-right: 0.5rem;
+}
+
+/* Iconos adaptativos según el fondo */
+.icon-white {
+  color: white !important;
+}
+
+.icon-dark {
+  color: #333 !important;
+}
+
+.icon-light {
+  color: #6c757d !important;
+}
+
+/* Iconos en el header (fondo oscuro) */
+.header .icon {
+  color: white;
+}
+
+.header .icon:hover {
+  opacity: 0.8;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  min-height: calc(100vh - 160px); /* Ajustado para incluir footer */
+  background: #f8f9fa;
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: white;
+  padding: 1.5rem 0;
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .nav {
+    gap: 1rem;
+  }
+
+  .search-input {
+    width: 200px;
+  }
+
+  .header-actions {
+    gap: 1rem;
+  }
+
+  .footer-container {
+    padding: 0 1rem;
+  }
+
+  .footer-text {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo h1 {
+    font-size: 1.5rem;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .search-input {
+    width: 150px;
+  }
+
+  .footer-text {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+}

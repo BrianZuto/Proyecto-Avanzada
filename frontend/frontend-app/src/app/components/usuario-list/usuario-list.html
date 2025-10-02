@@ -1,0 +1,57 @@
+<div class="usuario-list-container">
+  <h2>Lista de Usuarios</h2>
+
+  <div class="actions">
+    <button class="btn btn-primary" (click)="cargarUsuarios()">
+      Actualizar Lista
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Cargando usuarios...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error" class="usuarios-table">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Fecha Creación</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios">
+          <td>{{ usuario.id }}</td>
+          <td>{{ usuario.nombre }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ formatearFecha(usuario.fechaCreacion) }}</td>
+          <td>
+            <span [class]="usuario.activo ? 'badge badge-success' : 'badge badge-danger'">
+              {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-warning" (click)="editarUsuario(usuario)">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="eliminarUsuario(usuario.id!)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="usuarios.length === 0" class="no-data">
+      <p>No hay usuarios registrados.</p>
+    </div>
+  </div>
+</div>

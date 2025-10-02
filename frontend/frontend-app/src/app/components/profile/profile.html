@@ -1,0 +1,134 @@
+<app-main-layout *ngIf="user">
+  <div class="mi-cuenta-container">
+    <!-- Contenido principal con márgenes -->
+    <div class="main-content-wrapper">
+    <!-- Header Section -->
+  <div class="header-section">
+    <div class="avatar-container">
+      <div class="avatar-circle">
+        <span class="avatar-text">{{ user.nombre.charAt(0).toUpperCase() }}</span>
+      </div>
+    </div>
+    <div class="header-text">
+      <h1 class="main-title">Mi Cuenta</h1>
+      <p class="subtitle">Gestiona tu información personal y revisa tus compras</p>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <div class="navigation-bar">
+    <button class="nav-button" [class.active]="activeTab === 'perfil'" (click)="setActiveTab('perfil')">
+      <i class="bi bi-person nav-icon"></i>
+      <span class="nav-text">Perfil</span>
+    </button>
+    <button class="nav-button" [class.active]="activeTab === 'direcciones'" (click)="setActiveTab('direcciones')">
+      <i class="bi bi-geo-alt nav-icon"></i>
+      <span class="nav-text">Direcciones</span>
+    </button>
+    <button class="nav-button" [class.active]="activeTab === 'pedidos'" (click)="setActiveTab('pedidos')">
+      <i class="bi bi-box nav-icon"></i>
+      <span class="nav-text">Mis Pedidos</span>
+    </button>
+    <button class="nav-button" [class.active]="activeTab === 'pagos'" (click)="setActiveTab('pagos')">
+      <i class="bi bi-credit-card nav-icon"></i>
+      <span class="nav-text">Métodos de Pago</span>
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Información Personal Section -->
+    <div class="info-card" *ngIf="activeTab === 'perfil'">
+      <div class="card-header">
+        <h2 class="card-title">Información Personal</h2>
+        <p class="card-subtitle">Actualiza tu información personal y mantén tu perfil al día</p>
+      </div>
+
+      <form class="info-form" (ngSubmit)="saveChanges()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre" class="form-label">Nombre Completo</label>
+            <input
+              type="text"
+              id="nombre"
+              class="form-input"
+              [(ngModel)]="userData.nombre"
+              name="nombre"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              [(ngModel)]="userData.email"
+              name="email"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input
+              type="tel"
+              id="telefono"
+              class="form-input"
+              [(ngModel)]="userData.telefono"
+              name="telefono"
+              placeholder="+57 300 123 4567">
+          </div>
+          <div class="form-group">
+            <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+            <input
+              type="date"
+              id="fechaNacimiento"
+              class="form-input"
+              [(ngModel)]="userData.fechaNacimiento"
+              name="fechaNacimiento">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="save-button">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Placeholder sections for other tabs -->
+    <div class="info-card" *ngIf="activeTab === 'direcciones'">
+      <div class="card-header">
+        <h2 class="card-title">Direcciones</h2>
+        <p class="card-subtitle">Gestiona tus direcciones de envío</p>
+      </div>
+      <div class="placeholder-content">
+        <p>Funcionalidad de direcciones próximamente...</p>
+      </div>
+    </div>
+
+    <div class="info-card" *ngIf="activeTab === 'pedidos'">
+      <div class="card-header">
+        <h2 class="card-title">Mis Pedidos</h2>
+        <p class="card-subtitle">Revisa el historial de tus compras</p>
+      </div>
+      <div class="placeholder-content">
+        <p>Funcionalidad de pedidos próximamente...</p>
+      </div>
+    </div>
+
+    <div class="info-card" *ngIf="activeTab === 'pagos'">
+      <div class="card-header">
+        <h2 class="card-title">Métodos de Pago</h2>
+        <p class="card-subtitle">Gestiona tus métodos de pago</p>
+      </div>
+      <div class="placeholder-content">
+        <p>Funcionalidad de métodos de pago próximamente...</p>
+      </div>
+    </div>
+    </div>
+    </div> <!-- Cierre del main-content-wrapper -->
+  </div> <!-- Cierre del mi-cuenta-container -->
+</app-main-layout>

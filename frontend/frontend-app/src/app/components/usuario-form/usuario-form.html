@@ -1,0 +1,60 @@
+<div class="usuario-form-container">
+  <h3>{{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
+
+  <form (ngSubmit)="onSubmit()" #usuarioForm="ngForm">
+    <div class="form-group">
+      <label for="nombre">Nombre:</label>
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        [(ngModel)]="formUsuario.nombre"
+        required
+        class="form-control"
+        placeholder="Ingrese el nombre del usuario">
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="formUsuario.email"
+        required
+        class="form-control"
+        placeholder="Ingrese el email del usuario">
+    </div>
+
+    <div class="form-group" *ngIf="!modoEdicion">
+      <label for="password">Contraseña:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        [(ngModel)]="formUsuario.password"
+        required
+        class="form-control"
+        placeholder="Ingrese la contraseña">
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [(ngModel)]="formUsuario.activo"
+          name="activo">
+        Usuario Activo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="!usuarioForm.form.valid">
+        {{ modoEdicion ? 'Actualizar' : 'Crear' }} Usuario
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
