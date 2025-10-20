@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -272,6 +273,8 @@ public class AuthController {
         private String nombre;
         private String email;
         private String password;
+        private LocalDate fechaNacimiento;
+        private String telefono;
         
         // Getters y setters
         public String getNombre() { return nombre; }
@@ -280,6 +283,10 @@ public class AuthController {
         public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
+        public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+        public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+        public String getTelefono() { return telefono; }
+        public void setTelefono(String telefono) { this.telefono = telefono; }
     }
     
     public static class EmailCheckRequest {

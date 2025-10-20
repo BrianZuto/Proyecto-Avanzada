@@ -4,25 +4,63 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para desarrollo
+            .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para APIs REST
+            .cors(cors -> cors.configurationSource(corsConfigurationSource)) // Configurar CORS
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin sesiones
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/usuarios/**").permitAll() // Permitir acceso a todos los endpoints de usuarios
-                .requestMatchers("/api/**").permitAll() // Permitir acceso a todos los endpoints de la API
-                .requestMatchers("/usuarios/**").permitAll() // Permitir acceso directo a usuarios
-                .anyRequest().permitAll() // Permitir todo para desarrollo
+                // Endpoints públicos (sin autenticación)
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/test/**").permitAll()
+                .requestMatchers("/api/usuarios/register").permitAll()
+                .requestMatchers("/api/usuarios/check-email").permitAll()
+                .requestMatchers("/api/usuarios/generate-hash").permitAll()
+                
+                // Endpoints que requieren autenticación
+                .requestMatchers("/api/usuarios/**").authenticated()
+                .requestMatchers("/api/clientes/**").authenticated()
+                .requestMatchers("/api/categorias/**").authenticated()
+                .requestMatchers("/api/marcas/**").authenticated()
+                .requestMatchers("/api/productos/**").authenticated()
+                .requestMatchers("/api/presentaciones/**").authenticated()
+                .requestMatchers("/api/proveedores/**").authenticated()
+                .requestMatchers("/api/compras/**").authenticated()
+                .requestMatchers("/api/ventas/**").authenticated()
+                .requestMatchers("/api/reportes/**").authenticated()
+                
+                // Permitir acceso a recursos estáticos
+                .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
+                
+                // Cualquier otra petición requiere autenticación
+                .anyRequest().authenticated()
             )
             .httpBasic(httpBasic -> httpBasic.disable()) // Deshabilitar autenticación básica
-            .formLogin(formLogin -> formLogin.disable()); // Deshabilitar formulario de login
+            .formLogin(formLogin -> formLogin.disable()) // Deshabilitar formulario de login
+            .logout(logout -> logout.disable()); // Deshabilitar logout por defecto
 
         return http.build();
     }
+
 }
