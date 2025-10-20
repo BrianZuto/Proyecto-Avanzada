@@ -1,5 +1,12 @@
 # 🏪 Proyecto Avanzada - Sistema de Venta de Sneakers
 
+## 📚 Información Académica
+
+**Asignatura:** Programación Avanzada  
+**Estudiantes:** 
+- Brian Zuleta Tobón
+- Luis Torres
+
 Este proyecto consiste en una aplicación web full stack desarrollada con **Angular** (Frontend) y **Spring Boot** (Backend), utilizando **XAMPP** con **MySQL** como base de datos. Es un sistema completo de gestión de ventas de sneakers con funcionalidades avanzadas de inventario, clientes, compras, ventas y reportes.
 
 ## 🎯 Estado del Proyecto
@@ -419,5 +426,12 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ---
 
+## 👨‍💻 Desarrolladores
+
+**Estudiantes de Programación Avanzada:**
+- **Brian Zuleta Tobón**
+- **Luis Torres**
+
 **Desarrollado con ❤️ usando Angular + Spring Boot**  
-**Versión:** 2.0.0 | **Estado:** Backend Completo, Frontend en Desarrollo
+**Versión:** 2.0.0 | **Estado:** Backend Completo, Frontend en Desarrollo  
+**Asignatura:** Programación Avanzada
