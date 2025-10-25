@@ -37,6 +37,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/usuarios/check-email").permitAll()
                 .requestMatchers("/api/usuarios/generate-hash").permitAll()
                 
+                // Swagger/OpenAPI endpoints (públicos para desarrollo)
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/api-docs/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
+                
                 // Endpoints que requieren autenticación
                 .requestMatchers("/api/usuarios/**").authenticated()
                 .requestMatchers("/api/clientes/**").authenticated()

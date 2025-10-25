@@ -2,6 +2,14 @@ package com.proyectoavanzada.backend.controller;
 
 import com.proyectoavanzada.backend.model.Categoria;
 import com.proyectoavanzada.backend.service.CategoriaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +24,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/categorias")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Gestión de Categorías", description = "Endpoints para la gestión completa de categorías de productos")
 public class CategoriaController {
     
     @Autowired
