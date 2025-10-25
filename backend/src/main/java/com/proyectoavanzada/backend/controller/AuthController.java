@@ -2,6 +2,14 @@ package com.proyectoavanzada.backend.controller;
 
 import com.proyectoavanzada.backend.model.Usuario;
 import com.proyectoavanzada.backend.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +24,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Autenticación", description = "Endpoints para autenticación y registro de usuarios")
 public class AuthController {
     
     @Autowired
@@ -26,8 +35,41 @@ public class AuthController {
      * @param loginRequest datos de login (email y password)
      * @return respuesta con token o error
      */
+    @Operation(
+        summary = "Iniciar sesión",
+        description = "Autentica un usuario con email y contraseña"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Login exitoso",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Map.class),
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"message\": \"Login exitoso\", \"user\": {\"id\": 1, \"nombre\": \"Usuario\", \"email\": \"usuario@email.com\"}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Credenciales inválidas",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": false, \"message\": \"Usuario no encontrado\"}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(
+        @Parameter(description = "Datos de login del usuario", required = true)
+        @Valid @RequestBody LoginRequest loginRequest) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -72,8 +114,40 @@ public class AuthController {
      * @param registerRequest datos de registro
      * @return respuesta con usuario creado o error
      */
+    @Operation(
+        summary = "Registrar usuario",
+        description = "Crea un nuevo usuario en el sistema"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Usuario registrado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"message\": \"Usuario registrado exitosamente\", \"user\": {\"id\": 1, \"nombre\": \"Usuario\", \"email\": \"usuario@email.com\"}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "El email ya está registrado",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": false, \"message\": \"El email ya está registrado\"}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<Map<String, Object>> register(
+        @Parameter(description = "Datos de registro del usuario", required = true)
+        @Valid @RequestBody RegisterRequest registerRequest) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -112,8 +186,30 @@ public class AuthController {
      * @param passwordRequest contraseña a encriptar
      * @return respuesta con el hash generado
      */
+    @Operation(
+        summary = "Generar hash de contraseña",
+        description = "Genera un hash BCrypt para una contraseña (endpoint temporal para desarrollo)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Hash generado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"originalPassword\": \"password123\", \"hashedPassword\": \"$2a$10$...\"}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error al generar hash"
+        )
+    })
     @PostMapping("/generate-hash")
-    public ResponseEntity<Map<String, Object>> generatePasswordHash(@RequestBody PasswordHashRequest passwordRequest) {
+    public ResponseEntity<Map<String, Object>> generatePasswordHash(
+        @Parameter(description = "Contraseña a encriptar", required = true)
+        @RequestBody PasswordHashRequest passwordRequest) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -137,8 +233,30 @@ public class AuthController {
      * @param emailRequest email a verificar
      * @return respuesta con si existe o no
      */
+    @Operation(
+        summary = "Verificar email",
+        description = "Verifica si un email ya está registrado en el sistema"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Verificación completada",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"exists\": false, \"message\": \"Email disponible\"}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error al verificar email"
+        )
+    })
     @PostMapping("/check-email")
-    public ResponseEntity<Map<String, Object>> checkEmailExists(@Valid @RequestBody EmailCheckRequest emailRequest) {
+    public ResponseEntity<Map<String, Object>> checkEmailExists(
+        @Parameter(description = "Email a verificar", required = true)
+        @Valid @RequestBody EmailCheckRequest emailRequest) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -158,8 +276,34 @@ public class AuthController {
      * @param userId ID del usuario
      * @return respuesta con el perfil completo
      */
+    @Operation(
+        summary = "Obtener perfil de usuario",
+        description = "Obtiene el perfil completo de un usuario por su ID"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Perfil obtenido exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"user\": {\"id\": 1, \"nombre\": \"Usuario\", \"email\": \"usuario@email.com\", \"telefono\": \"123456789\"}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Usuario no encontrado"
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error al obtener perfil"
+        )
+    })
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<Map<String, Object>> getProfile(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, Object>> getProfile(
+        @Parameter(description = "ID del usuario", required = true)
+        @PathVariable Long userId) {
         Map<String, Object> response = new HashMap<>();
         
         try {
@@ -187,8 +331,34 @@ public class AuthController {
      * @param updateRequest datos a actualizar
      * @return respuesta con el usuario actualizado
      */
+    @Operation(
+        summary = "Actualizar perfil de usuario",
+        description = "Actualiza los datos del perfil de un usuario"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Perfil actualizado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"message\": \"Perfil actualizado exitosamente\", \"user\": {\"id\": 1, \"nombre\": \"Usuario Actualizado\"}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Usuario no encontrado"
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error al actualizar perfil"
+        )
+    })
     @PutMapping("/update-profile")
-    public ResponseEntity<Map<String, Object>> updateProfile(@Valid @RequestBody UpdateProfileRequest updateRequest) {
+    public ResponseEntity<Map<String, Object>> updateProfile(
+        @Parameter(description = "Datos a actualizar del usuario", required = true)
+        @Valid @RequestBody UpdateProfileRequest updateRequest) {
         Map<String, Object> response = new HashMap<>();
         
         try {

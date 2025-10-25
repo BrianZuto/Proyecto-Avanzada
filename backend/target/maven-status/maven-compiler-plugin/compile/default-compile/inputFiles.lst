@@ -37,6 +37,7 @@ C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\back
 C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\service\ProveedorService.java
 C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\controller\AuthController.java
 C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\service\CompraService.java
+C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\config\OpenApiConfig.java
 C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\repository\InventarioRepository.java
 C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\model\Venta.java
 C:\xampp\htdocs\ProyectoAvanzada\backend\src\main\java\com\proyectoavanzada\backend\exception\AccessDeniedException.java

@@ -4,6 +4,14 @@ import com.proyectoavanzada.backend.model.Reporte;
 import com.proyectoavanzada.backend.model.Usuario;
 import com.proyectoavanzada.backend.service.ReporteService;
 import com.proyectoavanzada.backend.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +28,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/reportes")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Gestión de Reportes", description = "Endpoints para la generación y gestión de reportes del sistema")
 public class ReporteController {
     
     @Autowired

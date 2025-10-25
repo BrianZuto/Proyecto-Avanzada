@@ -6,6 +6,14 @@ import com.proyectoavanzada.backend.model.Marca;
 import com.proyectoavanzada.backend.service.ProductoService;
 import com.proyectoavanzada.backend.service.CategoriaService;
 import com.proyectoavanzada.backend.service.MarcaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +30,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/productos")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Gestión de Productos", description = "Endpoints para la gestión completa de productos del sistema de venta de tenis")
 public class ProductoController {
     
     @Autowired
@@ -36,6 +45,26 @@ public class ProductoController {
     /**
      * Obtener todos los productos
      */
+    @Operation(
+        summary = "Obtener todos los productos",
+        description = "Retorna una lista con todos los productos del sistema"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Lista de productos obtenida exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"data\": [], \"total\": 0}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @GetMapping
     public ResponseEntity<Map<String, Object>> obtenerTodosLosProductos() {
         Map<String, Object> response = new HashMap<>();
@@ -74,8 +103,34 @@ public class ProductoController {
     /**
      * Obtener producto por ID
      */
+    @Operation(
+        summary = "Obtener producto por ID",
+        description = "Retorna un producto específico basado en su ID"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Producto encontrado",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"data\": {\"id\": 1, \"nombre\": \"Nike Air Max\", \"precioVenta\": 150.00}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Producto no encontrado"
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> obtenerProductoPorId(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> obtenerProductoPorId(
+        @Parameter(description = "ID del producto", required = true)
+        @PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<Producto> productoOpt = productoService.obtenerProductoPorId(id);
@@ -347,8 +402,34 @@ public class ProductoController {
     /**
      * Crear nuevo producto
      */
+    @Operation(
+        summary = "Crear nuevo producto",
+        description = "Crea un nuevo producto en el sistema"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Producto creado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"message\": \"Producto creado exitosamente\", \"data\": {\"id\": 1, \"nombre\": \"Nike Air Max\"}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Datos de entrada inválidos"
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crearProducto(@Valid @RequestBody Producto producto) {
+    public ResponseEntity<Map<String, Object>> crearProducto(
+        @Parameter(description = "Datos del producto a crear", required = true)
+        @Valid @RequestBody Producto producto) {
         Map<String, Object> response = new HashMap<>();
         try {
             Producto productoGuardado = productoService.guardarProducto(producto);
@@ -366,8 +447,36 @@ public class ProductoController {
     /**
      * Actualizar producto
      */
+    @Operation(
+        summary = "Actualizar producto",
+        description = "Actualiza los datos de un producto existente"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Producto actualizado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"message\": \"Producto actualizado exitosamente\", \"data\": {\"id\": 1, \"nombre\": \"Nike Air Max Actualizado\"}}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Datos de entrada inválidos"
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> actualizarProducto(@PathVariable Long id, @Valid @RequestBody Producto producto) {
+    public ResponseEntity<Map<String, Object>> actualizarProducto(
+        @Parameter(description = "ID del producto a actualizar", required = true)
+        @PathVariable Long id, 
+        @Parameter(description = "Datos actualizados del producto", required = true)
+        @Valid @RequestBody Producto producto) {
         Map<String, Object> response = new HashMap<>();
         try {
             producto.setId(id);
@@ -386,8 +495,34 @@ public class ProductoController {
     /**
      * Eliminar producto (soft delete)
      */
+    @Operation(
+        summary = "Eliminar producto",
+        description = "Elimina un producto del sistema (soft delete)"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Producto eliminado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(
+                    value = "{\"success\": true, \"message\": \"Producto eliminado exitosamente\"}"
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Error al eliminar producto"
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno del servidor"
+        )
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> eliminarProducto(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> eliminarProducto(
+        @Parameter(description = "ID del producto a eliminar", required = true)
+        @PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
             productoService.eliminarProducto(id);
