@@ -1,0 +1,82 @@
+# Docker Compose para desarrollo de SneakerShop
+
+services:
+  # Base de datos MySQL para desarrollo
+  mysql:
+    image: mysql:8.0
+    container_name: sneakershop_mysql_dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sneakershop
+      MYSQL_USER: sneakershop_user
+      MYSQL_PASSWORD: sneakershop_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - sneakershop_dev_network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Backend Spring Boot para desarrollo
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sneakershop_backend_dev
+    restart: unless-stopped
+    environment:
+      # Configuración de la base de datos
+      DB_URL: jdbc:mysql://mysql:3306/sneakershop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: sneakershop_user
+      DB_PASSWORD: sneakershop_password
+      
+      # Configuración del servidor
+      SERVER_PORT: 8080
+      
+      # Configuración de CORS
+      CORS_ORIGINS: http://localhost:4200,http://frontend:80
+      
+      # Configuración de logging para desarrollo
+      LOG_LEVEL: DEBUG
+      SHOW_SQL: true
+      FORMAT_SQL: true
+      
+      # Configuración de Spring
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - sneakershop_dev_network
+    volumes:
+      - backend_logs_dev:/app/logs
+      - ./backend/src:/app/src
+
+  # Adminer para administración de base de datos
+  adminer:
+    image: adminer:latest
+    container_name: sneakershop_adminer_dev
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql
+    networks:
+      - sneakershop_dev_network
+
+# Volúmenes persistentes para desarrollo
+volumes:
+  mysql_dev_data:
+    driver: local
+  backend_logs_dev:
+    driver: local
+
+# Red personalizada para desarrollo
+networks:
+  sneakershop_dev_network:
+    driver: bridge
