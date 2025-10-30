@@ -47,7 +47,7 @@ html, body, div, span, app-root, header, section, footer {
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 70%, #000 100%);
+  background: #000;
   color: white;
   padding: 4rem 0;
   width: 100%;
@@ -73,7 +73,7 @@ html, body, div, span, app-root, header, section, footer {
 }
 
 .badge {
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background: linear-gradient(45deg, #0f172a, #1e3a8a, #3b82f6);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -92,7 +92,7 @@ html, body, div, span, app-root, header, section, footer {
 }
 
 .highlight {
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background: linear-gradient(45deg, #0f172a, #1e3a8a, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -125,14 +125,14 @@ html, body, div, span, app-root, header, section, footer {
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background: linear-gradient(45deg, #0b1324, #1e3a8a, #3b82f6);
   color: white;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.35);
 }
 
 .btn-secondary {
@@ -261,12 +261,12 @@ html, body, div, span, app-root, header, section, footer {
 }
 
 .tab:hover {
-  border-color: #4ecdc4;
-  color: #4ecdc4;
+  border-color: #3b82f6;
+  color: #3b82f6;
 }
 
 .tab.active {
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background: linear-gradient(45deg, #0b1324, #1e3a8a, #3b82f6);
   color: white;
   border-color: transparent;
 }
@@ -444,7 +444,7 @@ html, body, div, span, app-root, header, section, footer {
 .product-btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(45deg, #1a1a2e, #16213e);
+  background: linear-gradient(45deg, #0b1324, #1e3a8a);
   color: white;
   border: none;
   border-radius: 12px;
@@ -454,7 +454,7 @@ html, body, div, span, app-root, header, section, footer {
 }
 
 .product-btn:hover {
-  background: linear-gradient(45deg, #16213e, #0f3460);
+  background: linear-gradient(45deg, #0f172a, #3b82f6);
   transform: translateY(-2px);
 }
 

@@ -1,0 +1,41 @@
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-title">Gestión de Compras</div>
+    <button class="btn-primary-sm">
+      <i class="bi bi-plus"></i>
+      Agregar Compra
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <div class="table-row table-head">
+      <div class="col id">ID</div>
+      <div class="col proveedor">Proveedor</div>
+      <div class="col producto">Producto</div>
+      <div class="col cantidad">Cantidad</div>
+      <div class="col precio">Precio Total</div>
+      <div class="col fecha">Fecha</div>
+      <div class="col estado">Estado</div>
+      <div class="col acciones">Acciones</div>
+    </div>
+
+    <div class="table-row" *ngFor="let p of purchases">
+      <div class="col id">#{{ p.id }}</div>
+      <div class="col proveedor">{{ p.proveedor }}</div>
+      <div class="col producto">{{ p.producto }}</div>
+      <div class="col cantidad">{{ p.cantidad }}</div>
+      <div class="col precio">{{ p.precioTotal }}</div>
+      <div class="col fecha">{{ p.fecha }}</div>
+      <div class="col estado">
+        <span class="badge-state" [class.recibido]="p.estado==='Recibido'" [class.transito]="p.estado==='En tránsito'" [class.pendiente]="p.estado==='Pendiente'">{{ p.estado }}</span>
+      </div>
+      <div class="col acciones">
+        <button class="icon" title="Ver"><i class="bi bi-eye"></i></button>
+        <button class="icon" title="Editar"><i class="bi bi-pencil"></i></button>
+        <button class="icon" title="Eliminar"><i class="bi bi-trash"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,34 @@
+<app-main-layout>
+  <section class="hero">
+    <div class="hero-content">
+      <h2 class="hero-title">Sneakers para <span class="highlight">Hombres</span></h2>
+      <p class="hero-subtitle">Descubre nuestra colección exclusiva de sneakers masculinos.</p>
+    </div>
+  </section>
+
+  <section class="product-grid">
+    <div class="grid">
+      <div class="card" *ngFor="let p of productos">
+        <div class="card-image">
+          <img [src]="p.imagen" [alt]="p.modelo" />
+          <div class="badge" *ngIf="p.badge==='discount'">-{{p.descuento}}%</div>
+          <div class="badge new" *ngIf="p.badge==='new'">Nuevo</div>
+        </div>
+        <div class="card-body">
+          <div class="brand">{{ p.marca }}</div>
+          <div class="model">{{ p.modelo }}</div>
+          <div class="price">
+            <span class="current">${{ p.precio | number:'1.0-0' }}</span>
+            <span class="original" *ngIf="p.precioOriginal">${{ p.precioOriginal | number:'1.0-0' }}</span>
+          </div>
+          <div class="sizes">
+            <button class="size" *ngFor="let t of p.tallas">{{ t }}</button>
+          </div>
+          <button class="primary">Selecciona una talla</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</app-main-layout>
+
+
