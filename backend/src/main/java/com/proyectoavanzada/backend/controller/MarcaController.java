@@ -23,7 +23,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/marcas")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Marcas", description = "Endpoints para la gestión completa de marcas de productos")
 public class MarcaController {
     

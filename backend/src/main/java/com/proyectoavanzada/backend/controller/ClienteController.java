@@ -24,7 +24,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Clientes", description = "Endpoints para la gestión completa de clientes del sistema")
 public class ClienteController {
     

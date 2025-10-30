@@ -24,7 +24,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Autenticación", description = "Endpoints para autenticación y registro de usuarios")
 public class AuthController {
     

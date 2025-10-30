@@ -23,7 +23,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categorias")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Categorías", description = "Endpoints para la gestión completa de categorías de productos")
 public class CategoriaController {
     

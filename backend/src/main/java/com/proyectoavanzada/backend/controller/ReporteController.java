@@ -27,7 +27,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reportes")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Reportes", description = "Endpoints para la generación y gestión de reportes del sistema")
 public class ReporteController {
     
