@@ -34,9 +34,9 @@ docker-compose ps
 #### Acceder a la Aplicación
 
 - **Frontend (Angular):** http://localhost:4200
-- **Backend API:** http://localhost:8080/api
-- **Base de Datos (Adminer):** http://localhost:8081
-- **Swagger API Docs:** http://localhost:8080/swagger-ui.html
+- **Backend API:** http://localhost:8081/api
+- **Base de Datos (phpMyAdmin):** http://localhost:8083
+- **Swagger API Docs:** http://localhost:8081/swagger-ui.html
 
 ### Opción 2: Ejecución Individual (Desarrollo)
 

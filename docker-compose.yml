@@ -12,7 +12,7 @@ services:
       MYSQL_USER: sneakershop_user
       MYSQL_PASSWORD: sneakershop_password
     ports:
-      - "3307:3306"
+      - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database:/docker-entrypoint-initdb.d
@@ -32,26 +32,10 @@ services:
     container_name: sneakershop_backend
     restart: unless-stopped
     environment:
-      # Configuración de la base de datos
-      DB_URL: jdbc:mysql://mysql:3306/sneakershop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      DB_USERNAME: sneakershop_user
-      DB_PASSWORD: sneakershop_password
-      
-      # Configuración del servidor
-      SERVER_PORT: 8080
-      
-      # Configuración de CORS
-      CORS_ORIGINS: http://localhost:4200,http://frontend:80
-      
-      # Configuración de logging
-      LOG_LEVEL: INFO
-      SHOW_SQL: false
-      FORMAT_SQL: false
-      
       # Configuración de Spring
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: docker
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -74,13 +58,19 @@ services:
     networks:
       - sneakershop_network
 
-  # Adminer para administración de base de datos (opcional)
-  adminer:
-    image: adminer:latest
-    container_name: sneakershop_adminer
+  # phpMyAdmin para administración de base de datos
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: sneakershop_phpmyadmin
     restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: sneakershop_user
+      PMA_PASSWORD: sneakershop_password
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "8081:8080"
+      - "8083:80"
     depends_on:
       - mysql
     networks:

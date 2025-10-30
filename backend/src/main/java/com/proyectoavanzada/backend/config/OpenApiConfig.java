@@ -30,13 +30,8 @@ public class OpenApiConfig {
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
-                .servers(List.of(
-                        new Server()
-                                .url("http://localhost:8080")
-                                .description("Servidor de Desarrollo"),
-                        new Server()
-                                .url("https://api.proyectoavanzada.com")
-                                .description("Servidor de Producción")))
+                // No fijamos servidores para que Swagger use el mismo origen/puerto actual (evita 8080 hardcodeado)
+                .servers(List.of())
                 .addSecurityItem(new SecurityRequirement()
                         .addList("Bearer Authentication"))
                 .components(new Components()

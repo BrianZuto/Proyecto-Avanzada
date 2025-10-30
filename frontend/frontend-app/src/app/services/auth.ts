@@ -23,10 +23,31 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {
-    // Verificar si hay un usuario guardado en localStorage
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    const token = localStorage.getItem('authToken');
+    if (savedUser && token) {
       this.currentUserSubject.next(JSON.parse(savedUser));
+      // TEST LOG: Mostrar estado del token al iniciar la app
+      this.logTokenStatus(token, 'INIT');
+    }
+  }
+
+  // TEST: Decodificar JWT y mostrar expiración en consola
+  private logTokenStatus(token: string, source: 'LOGIN' | 'REGISTER' | 'INIT') {
+    try {
+      const payloadPart = token.split('.')[1];
+      const payload = JSON.parse(atob(payloadPart));
+      const expSec: number = payload.exp; // segundos desde epoch
+      const nowMs = Date.now();
+      const expMs = expSec * 1000;
+      const remainingMs = expMs - nowMs;
+      const active = remainingMs > 0;
+      const remainingMin = Math.max(0, Math.floor(remainingMs / 60000));
+      const expDate = new Date(expMs).toISOString();
+      // Mensaje de prueba en consola
+      console.log(`[JWT ${source}] Token ${active ? 'ACTIVO' : 'EXPIRADO'} | Expira: ${expDate} | Quedan ~${remainingMin} min`);
+    } catch (e) {
+      console.warn(`[JWT ${source}] No se pudo decodificar el token para logs de prueba`);
     }
   }
 
@@ -44,6 +65,11 @@ export class AuthService {
             };
             this.currentUserSubject.next(user);
             localStorage.setItem('currentUser', JSON.stringify(user));
+            if (response.token) {
+              localStorage.setItem('authToken', response.token);
+            // TEST LOG
+            this.logTokenStatus(response.token, 'LOGIN');
+            }
             observer.next(true);
           } else {
             observer.next(false);
@@ -72,6 +98,11 @@ export class AuthService {
             };
             this.currentUserSubject.next(user);
             localStorage.setItem('currentUser', JSON.stringify(user));
+            if (response.token) {
+              localStorage.setItem('authToken', response.token);
+            // TEST LOG
+            this.logTokenStatus(response.token, 'REGISTER');
+            }
             observer.next(true);
           } else {
             observer.next(false);
@@ -89,6 +120,7 @@ export class AuthService {
   logout(): void {
     this.currentUserSubject.next(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
   }
 
   isLoggedIn(): boolean {
@@ -116,7 +148,6 @@ export class AuthService {
     return this.hasRole('Usuario');
   }
 
-  // Método para verificar si un email ya existe
   checkEmailExists(email: string): Observable<boolean> {
     return new Observable(observer => {
       this.http.post<any>(`${this.apiUrl}/check-email`, { email }).subscribe({
@@ -132,7 +163,6 @@ export class AuthService {
     });
   }
 
-  // Método para obtener el perfil completo del usuario
   getFullProfile(userId: number): Observable<User | null> {
     return new Observable(observer => {
       this.http.get<any>(`${this.apiUrl}/profile/${userId}`).subscribe({
@@ -161,13 +191,11 @@ export class AuthService {
     });
   }
 
-  // Método para actualizar el perfil del usuario
   updateProfile(userData: { id: number; nombre?: string; telefono?: string; fechaNacimiento?: string }): Observable<boolean> {
     return new Observable(observer => {
       this.http.put<any>(`${this.apiUrl}/update-profile`, userData).subscribe({
         next: (response) => {
           if (response.success) {
-            // Actualizar el usuario actual con los nuevos datos
             const currentUser = this.currentUserSubject.value;
             if (currentUser) {
               const updatedUser: User = {
