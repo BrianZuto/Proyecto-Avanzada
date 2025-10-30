@@ -2,6 +2,7 @@ package com.proyectoavanzada.backend.controller;
 
 import com.proyectoavanzada.backend.model.Usuario;
 import com.proyectoavanzada.backend.service.UsuarioService;
+import com.proyectoavanzada.backend.security.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,6 +31,9 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
     
+    @Autowired
+    private JwtService jwtService;
+    
     /**
      * Endpoint para login de usuarios
      * @param loginRequest datos de login (email y password)
@@ -47,7 +51,7 @@ public class AuthController {
                 mediaType = "application/json",
                 schema = @Schema(implementation = Map.class),
                 examples = @ExampleObject(
-                    value = "{\"success\": true, \"message\": \"Login exitoso\", \"user\": {\"id\": 1, \"nombre\": \"Usuario\", \"email\": \"usuario@email.com\"}}"
+                    value = "{\n  \"success\": true,\n  \"message\": \"Login exitoso\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": 1,\n    \"nombre\": \"Usuario\",\n    \"email\": \"usuario@email.com\",\n    \"activo\": true,\n    \"rol\": \"Usuario\"\n  }\n}"
                 )
             )
         ),
@@ -86,6 +90,8 @@ public class AuthController {
                         response.put("success", true);
                         response.put("message", "Login exitoso");
                         response.put("user", createUserResponse(usuario));
+                        String token = jwtService.generateToken(usuario.getEmail());
+                        response.put("token", token);
                         return ResponseEntity.ok(response);
                     } else {
                         response.put("success", false);
@@ -125,7 +131,7 @@ public class AuthController {
             content = @Content(
                 mediaType = "application/json",
                 examples = @ExampleObject(
-                    value = "{\"success\": true, \"message\": \"Usuario registrado exitosamente\", \"user\": {\"id\": 1, \"nombre\": \"Usuario\", \"email\": \"usuario@email.com\"}}"
+                    value = "{\n  \"success\": true,\n  \"message\": \"Usuario registrado exitosamente\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": 1,\n    \"nombre\": \"Usuario\",\n    \"email\": \"usuario@email.com\",\n    \"activo\": true,\n    \"rol\": \"Usuario\"\n  }\n}"
                 )
             )
         ),
@@ -171,6 +177,8 @@ public class AuthController {
             response.put("success", true);
             response.put("message", "Usuario registrado exitosamente");
             response.put("user", createUserResponse(usuarioGuardado));
+            String token = jwtService.generateToken(usuarioGuardado.getEmail());
+            response.put("token", token);
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
             
