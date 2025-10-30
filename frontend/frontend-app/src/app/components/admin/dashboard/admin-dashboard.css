@@ -1,0 +1,21 @@
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; margin-bottom: 16px; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.label { color: #6b7280; font-size: 12px; text-transform: uppercase; }
+.value { font-size: 26px; font-weight: 800; margin-top: 4px; }
+.hint { color: #22c55e; font-size: 12px; margin-top: 4px; }
+
+.panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 2px rgba(16,24,40,.04); margin-top: 16px; }
+.panel-title { font-weight: 700; padding: 12px 16px; border-bottom: 1px solid #eee; }
+.table { padding: 8px 16px 16px; }
+.thead, .row { display: grid; grid-template-columns: 1.2fr 1.2fr 1.4fr 1fr 1fr 1fr; align-items: center; }
+.thead { font-size: 12px; color: #6b7280; text-transform: uppercase; padding: 8px 0; }
+.row { padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+.row:last-child { border-bottom: none; }
+.badge { padding: 6px 10px; border-radius: 999px; font-size: 12px; background: #e5e7eb; }
+.badge.ok { background: #d1fae5; color: #065f46; }
+.badge.warn { background: #fde68a; color: #92400e; }
+.badge.info { background: #dbeafe; color: #1e3a8a; }
+
+@media (max-width: 992px) { .metrics { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .metrics { grid-template-columns: 1fr; } .thead, .row { grid-template-columns: 1fr; } }
+

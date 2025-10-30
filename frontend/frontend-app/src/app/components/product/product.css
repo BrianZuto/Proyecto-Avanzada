@@ -1,0 +1,11 @@
+.product-row { display: grid; grid-template-columns: 0.6fr 2fr 1fr 1fr 0.8fr 0.8fr 1fr 1.2fr; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; background: #fff; }
+.product-row:last-child { border-bottom: none; }
+.cell { font-size: 14px; color: #111827; }
+.price { font-weight: 600; }
+.badge { padding: 6px 10px; border-radius: 999px; font-size: 12px; background: #e5e7eb; }
+.badge.ok { background: #d1fae5; color: #065f46; }
+.badge.warn { background: #fde68a; color: #92400e; }
+.icon { background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; padding: 6px 8px; cursor: pointer; margin-right: 6px; line-height: 1; }
+.icon:hover { background: #f8fafc; }
+
+

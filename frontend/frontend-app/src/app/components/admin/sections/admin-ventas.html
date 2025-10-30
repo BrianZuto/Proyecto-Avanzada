@@ -1,0 +1,52 @@
+<div class="grid">
+  <section class="card">
+    <div class="card-title">Ventas por Mes</div>
+    <div class="chart-placeholder">
+      <i class="bi bi-bar-chart"></i>
+      <span>Gráfico de ventas mensuales</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-title">Productos Más Vendidos</div>
+    <div class="top-products">
+      <div class="product-row" *ngFor="let p of topProducts">
+        <div class="rank">#{{ p.posicion }}</div>
+        <div class="info">
+          <div class="name">{{ p.nombre }}</div>
+          <div class="brand">{{ p.marca }}</div>
+        </div>
+        <div class="sales">{{ p.ventas }} ventas</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section class="card full">
+  <div class="card-title">Todas las Órdenes</div>
+  <div class="orders-head">
+    <div class="col ord">Orden</div>
+    <div class="col cli">Cliente</div>
+    <div class="col prod">Producto</div>
+    <div class="col monto">Monto</div>
+    <div class="col estado">Estado</div>
+    <div class="col fecha">Fecha</div>
+    <div class="col acc">Acciones</div>
+  </div>
+
+  <div class="orders-row" *ngFor="let o of orders">
+    <div class="col ord">#{{ o.id }}</div>
+    <div class="col cli">{{ o.cliente }}</div>
+    <div class="col prod">{{ o.producto }}</div>
+    <div class="col monto">{{ o.monto }}</div>
+    <div class="col estado">
+      <span class="chip" [class.success]="o.estado==='Completado'" [class.warning]="o.estado==='Pendiente'" [class.info]="o.estado==='Enviado'">{{ o.estado }}</span>
+    </div>
+    <div class="col fecha">{{ o.fecha }}</div>
+    <div class="col acc">
+      <button class="icon" title="Ver"><i class="bi bi-eye"></i></button>
+    </div>
+  </div>
+</section>
+
+

@@ -1,0 +1,25 @@
+<app-main-layout>
+  <section class="admin-wrapper">
+    <!-- Encabezado estilo "Mi Cuenta" -->
+    <div class="admin-header">
+      <div class="avatar">A</div>
+      <div class="headings">
+        <h1 class="title">Dashboard Administrativo</h1>
+        <p class="subtitle">Gestiona tu información de la tienda y revisa tus operaciones</p>
+      </div>
+    </div>
+
+    <!-- Barra de navegación tipo Mi Perfil -->
+    <div class="navigation-bar">
+      <button class="nav-button" routerLink="./dashboard" routerLinkActive="active"><i class="bi bi-speedometer2 nav-icon"></i><span class="nav-text">Dashboard</span></button>
+      <button class="nav-button" routerLink="./productos" routerLinkActive="active"><i class="bi bi-box nav-icon"></i><span class="nav-text">Productos</span></button>
+      <button class="nav-button" routerLink="./compras" routerLinkActive="active"><i class="bi bi-cart-check nav-icon"></i><span class="nav-text">Compras</span></button>
+      <button class="nav-button" routerLink="./ventas" routerLinkActive="active"><i class="bi bi-cash nav-icon"></i><span class="nav-text">Ventas</span></button>
+      <button class="nav-button" routerLink="./usuarios" routerLinkActive="active"><i class="bi bi-people nav-icon"></i><span class="nav-text">Usuarios</span></button>
+    </div>
+
+    <router-outlet></router-outlet>
+  </section>
+</app-main-layout>
+
+

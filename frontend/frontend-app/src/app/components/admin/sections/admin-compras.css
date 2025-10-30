@@ -1,0 +1,28 @@
+.panel { background: #fff; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.panel-title { font-size: 1.2rem; font-weight: 700; color: #111827; }
+
+.btn-primary-sm { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(45deg, #0f172a, #1e3a8a, #3b82f6); color: #fff; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
+.btn-primary-sm:hover { transform: translateY(-1px); }
+
+.table-wrapper { width: 100%; }
+.table-head { background: #f8f9fa; font-weight: 700; color: #334155; border-top-left-radius: 6px; border-top-right-radius: 6px; }
+.table-row { display: grid; grid-template-columns: 0.5fr 2fr 2fr 1fr 1.2fr 1fr 1fr 1.2fr; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid #f1f5f9; }
+.table-row:hover { background: #fcfcfd; }
+
+.col.id { color: #64748b; font-weight: 600; }
+.col.acciones { display: flex; gap: 6px; }
+
+.icon { background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; padding: 6px 8px; cursor: pointer; line-height: 1; }
+.icon:hover { background: #f8fafc; }
+
+.badge-state { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+.badge-state.recibido { background: #e0e7ff; color: #1e3a8a; }
+.badge-state.transito { background: #e7f5ff; color: #0c4a6e; }
+.badge-state.pendiente { background: #fff7ed; color: #b45309; }
+
+@media (max-width: 900px) {
+  .table-row { grid-template-columns: 0.5fr 1.6fr 1.6fr 0.9fr 1.2fr 1fr 1fr 1.2fr; }
+}
+
+

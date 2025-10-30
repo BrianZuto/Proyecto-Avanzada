@@ -1,0 +1,36 @@
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-title">Gestión de Usuarios</div>
+    <button class="btn-primary-sm">
+      <i class="bi bi-plus"></i>
+      Agregar Usuario
+    </button>
+  </div>
+
+  <div class="table-head">
+    <div class="col id">ID</div>
+    <div class="col nombre">Nombre</div>
+    <div class="col email">Email</div>
+    <div class="col rol">Rol</div>
+    <div class="col login">Último Login</div>
+    <div class="col estado">Estado</div>
+    <div class="col acciones">Acciones</div>
+  </div>
+
+  <div class="table-row" *ngFor="let u of users">
+    <div class="col id">#{{ u.id }}</div>
+    <div class="col nombre">{{ u.nombre }}</div>
+    <div class="col email">{{ u.email }}</div>
+    <div class="col rol">{{ u.rol }}</div>
+    <div class="col login">{{ u.ultimoLogin }}</div>
+    <div class="col estado">
+      <span class="chip" [class.success]="u.estado==='Activo'" [class.danger]="u.estado==='Inactivo'">{{ u.estado }}</span>
+    </div>
+    <div class="col acciones">
+      <button class="icon" title="Editar"><i class="bi bi-pencil"></i></button>
+      <button class="icon" title="Eliminar"><i class="bi bi-trash"></i></button>
+    </div>
+  </div>
+</div>
+
+

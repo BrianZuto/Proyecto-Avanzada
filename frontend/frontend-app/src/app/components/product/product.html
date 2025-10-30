@@ -1,0 +1,18 @@
+<div class="product-row">
+  <div class="cell id">#{{ product.id }}</div>
+  <div class="cell name">{{ product.nombre }}</div>
+  <div class="cell brand">{{ product.marca }}</div>
+  <div class="cell price">${{ product.precio | number:'1.0-0' }}</div>
+  <div class="cell stock">{{ product.stock }}</div>
+  <div class="cell sales">{{ product.ventas }}</div>
+  <div class="cell state">
+    <span class="badge" [class.ok]="product.estado==='Activo'" [class.warn]="product.estado==='Agotado'">{{ product.estado }}</span>
+  </div>
+  <div class="cell actions">
+    <button class="icon" title="Ver"><i class="bi bi-eye"></i></button>
+    <button class="icon" title="Editar"><i class="bi bi-pencil"></i></button>
+    <button class="icon" title="Eliminar"><i class="bi bi-trash"></i></button>
+  </div>
+</div>
+
+

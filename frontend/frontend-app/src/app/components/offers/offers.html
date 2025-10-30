@@ -1,0 +1,63 @@
+<app-main-layout>
+  <!-- Hero negro con degradado de texto en azul -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge">Ofertas Especiales</div>
+      <h2 class="hero-title">Hasta <span class="highlight">70% OFF</span></h2>
+      <p class="hero-subtitle">Los mejores sneakers con descuentos increíbles. Ofertas limitadas por tiempo.</p>
+      <div class="hero-note">Ofertas válidas hasta agotar existencias</div>
+    </div>
+  </section>
+
+  <!-- Estadísticas rápidas -->
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">{{ stats.count }}</div>
+        <div class="stat-label">Productos en oferta</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">${{ stats.savings | number:'1.0-0' }}</div>
+        <div class="stat-label">Ahorros disponibles</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ stats.maxDiscount }}%</div>
+        <div class="stat-label">Descuento máximo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner destacado -->
+  <section class="hot-banner">
+    <div class="hot-content">
+      <div>
+        <h3>¡Ofertas Calientes!</h3>
+        <p>Los productos más populares con los mejores descuentos</p>
+      </div>
+      <button class="chip">TIEMPO LIMITADO</button>
+    </div>
+  </section>
+
+  <!-- Grid de productos con descuento -->
+  <section class="product-grid">
+    <div class="grid">
+      <div class="card" *ngFor="let p of productos">
+        <div class="card-image">
+          <img [src]="p.imagen" [alt]="p.modelo" />
+          <div class="badge discount">-{{ p.descuento }}%</div>
+        </div>
+        <div class="card-body">
+          <div class="brand">{{ p.marca }}</div>
+          <div class="model">{{ p.modelo }}</div>
+          <div class="price">
+            <span class="current">${{ p.precio | number:'1.0-0' }}</span>
+            <span class="original">${{ p.precioOriginal | number:'1.0-0' }}</span>
+          </div>
+          <button class="primary">Selecciona una talla</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</app-main-layout>
+
+

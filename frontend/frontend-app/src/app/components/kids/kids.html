@@ -1,0 +1,40 @@
+<app-main-layout>
+  <section class="hero">
+    <div class="hero-content">
+      <h2 class="hero-title">Sneakers para <span class="highlight">Niños</span></h2>
+      <p class="hero-subtitle">Los sneakers más cool para los pequeños atletas.</p>
+    </div>
+  </section>
+
+  <section class="size-guide">
+    <div class="guide">
+      <strong>Guía de Tallas para Niños:</strong>
+      <div> <b>Tallas C (Child):</b> 10C-13C (bebés y niños pequeños, ~2-4 años)</div>
+      <div> <b>Tallas Y (Youth):</b> 1Y-6Y (niños más grandes, ~5-12 años)</div>
+    </div>
+  </section>
+
+  <section class="product-grid">
+    <div class="grid">
+      <div class="card" *ngFor="let p of productos">
+        <div class="card-image">
+          <img [src]="p.imagen" [alt]="p.modelo" />
+        </div>
+        <div class="card-body">
+          <div class="brand">{{ p.marca }}</div>
+          <div class="model">{{ p.modelo }}</div>
+          <div class="price">
+            <span class="current">${{ p.precio | number:'1.0-0' }}</span>
+            <span class="original" *ngIf="p.precioOriginal">${{ p.precioOriginal | number:'1.0-0' }}</span>
+          </div>
+          <div class="sizes">
+            <button class="size" *ngFor="let t of p.tallas">{{ t }}</button>
+          </div>
+          <button class="primary">Selecciona una talla</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</app-main-layout>
+
+
