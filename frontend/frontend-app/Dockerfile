@@ -18,8 +18,8 @@ RUN npm ci
 # Copiar código fuente
 COPY . .
 
-# Construir la aplicación para Docker
-RUN npm run build --configuration=docker
+# Construir la aplicación para producción (AWS)
+RUN npm run build --configuration=production
 
 # Etapa 2: Servidor web
 FROM nginx:alpine
