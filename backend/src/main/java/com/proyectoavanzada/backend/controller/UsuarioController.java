@@ -23,7 +23,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Usuarios", description = "Endpoints para la gestión completa de usuarios del sistema")
 public class UsuarioController {
     

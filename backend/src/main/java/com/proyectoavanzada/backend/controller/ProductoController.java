@@ -29,7 +29,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/productos")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Productos", description = "Endpoints para la gestión completa de productos del sistema de venta de tenis")
 public class ProductoController {
     

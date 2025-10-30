@@ -30,7 +30,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/compras")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Gestión de Compras", description = "Endpoints para la gestión completa de compras del sistema")
 public class CompraController {
     
