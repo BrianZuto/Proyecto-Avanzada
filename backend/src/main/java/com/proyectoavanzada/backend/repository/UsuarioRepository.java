@@ -11,14 +11,28 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
     /**
-     * Busca un usuario por su email
+     * Busca un usuario por su email (case insensitive)
+     * @param email el email del usuario
+     * @return Optional con el usuario si existe
+     */
+    Optional<Usuario> findByEmailIgnoreCase(String email);
+    
+    /**
+     * Busca un usuario por su email (para compatibilidad)
      * @param email el email del usuario
      * @return Optional con el usuario si existe
      */
     Optional<Usuario> findByEmail(String email);
     
     /**
-     * Verifica si existe un usuario con el email dado
+     * Verifica si existe un usuario con el email dado (case insensitive)
+     * @param email el email a verificar
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsByEmailIgnoreCase(String email);
+    
+    /**
+     * Verifica si existe un usuario con el email dado (para compatibilidad)
      * @param email el email a verificar
      * @return true si existe, false en caso contrario
      */

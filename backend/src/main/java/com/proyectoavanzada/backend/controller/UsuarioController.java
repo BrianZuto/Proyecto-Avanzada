@@ -109,9 +109,19 @@ public class UsuarioController {
         )
     })
     @GetMapping
-    public ResponseEntity<List<Usuario>> obtenerTodosLosUsuarios() {
-        List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
-        return ResponseEntity.ok(usuarios);
+    public ResponseEntity<Map<String, Object>> obtenerTodosLosUsuarios() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
+            response.put("success", true);
+            response.put("data", usuarios);
+            response.put("total", usuarios.size());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al obtener usuarios: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
     
     /**
@@ -174,16 +184,28 @@ public class UsuarioController {
         )
     })
     @PostMapping
-    public ResponseEntity<Usuario> crearUsuario(
+    public ResponseEntity<Map<String, Object>> crearUsuario(
         @Parameter(description = "Datos del usuario a crear", required = true)
         @Valid @RequestBody Usuario usuario) {
-        // Verificar si ya existe un usuario con ese email
-        if (usuarioService.existeUsuarioConEmail(usuario.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // Verificar si ya existe un usuario con ese email
+            if (usuarioService.existeUsuarioConEmail(usuario.getEmail())) {
+                response.put("success", false);
+                response.put("message", "El email ya está registrado");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            }
+            
+            Usuario usuarioCreado = usuarioService.guardarUsuario(usuario);
+            response.put("success", true);
+            response.put("message", "Usuario creado exitosamente");
+            response.put("data", usuarioCreado);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al crear usuario: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        
-        Usuario usuarioCreado = usuarioService.guardarUsuario(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCreado);
     }
     
     /**
@@ -215,20 +237,46 @@ public class UsuarioController {
         )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(
+    public ResponseEntity<Map<String, Object>> actualizarUsuario(
         @Parameter(description = "ID del usuario a actualizar", required = true)
         @PathVariable Long id, 
         @Parameter(description = "Datos actualizados del usuario", required = true)
         @Valid @RequestBody Usuario usuarioActualizado) {
-        Optional<Usuario> usuarioExistente = usuarioService.obtenerUsuarioPorId(id);
-        
-        if (usuarioExistente.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Usuario> usuarioExistente = usuarioService.obtenerUsuarioPorId(id);
+            
+            if (usuarioExistente.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Usuario no encontrado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            
+            // Verificar si el email está siendo cambiado y si ya existe
+            if (!usuarioExistente.get().getEmail().equalsIgnoreCase(usuarioActualizado.getEmail())) {
+                if (usuarioService.existeUsuarioConEmail(usuarioActualizado.getEmail())) {
+                    response.put("success", false);
+                    response.put("message", "El email ya está registrado");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+                }
+            }
+            
+            usuarioActualizado.setId(id);
+            // Si no se proporciona contraseña, mantener la existente
+            if (usuarioActualizado.getPassword() == null || usuarioActualizado.getPassword().trim().isEmpty()) {
+                usuarioActualizado.setPassword(usuarioExistente.get().getPassword());
+            }
+            
+            Usuario usuarioActualizadoResult = usuarioService.actualizarUsuario(usuarioActualizado);
+            response.put("success", true);
+            response.put("message", "Usuario actualizado exitosamente");
+            response.put("data", usuarioActualizadoResult);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al actualizar usuario: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        
-        usuarioActualizado.setId(id);
-        Usuario usuarioActualizadoResult = usuarioService.actualizarUsuario(usuarioActualizado);
-        return ResponseEntity.ok(usuarioActualizadoResult);
     }
     
     /**
@@ -251,17 +299,28 @@ public class UsuarioController {
         )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarUsuario(
+    public ResponseEntity<Map<String, Object>> eliminarUsuario(
         @Parameter(description = "ID del usuario a eliminar", required = true)
         @PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioService.obtenerUsuarioPorId(id);
-        
-        if (usuario.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Usuario> usuario = usuarioService.obtenerUsuarioPorId(id);
+            
+            if (usuario.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Usuario no encontrado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            
+            usuarioService.eliminarUsuario(id);
+            response.put("success", true);
+            response.put("message", "Usuario eliminado exitosamente");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al eliminar usuario: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        
-        usuarioService.eliminarUsuario(id);
-        return ResponseEntity.noContent().build();
     }
     
     /**

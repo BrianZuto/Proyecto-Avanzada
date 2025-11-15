@@ -1,5 +1,6 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -37,6 +38,7 @@ public class Categoria {
     
     // Relación con productos
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Producto> productos;
     
     // Constructores

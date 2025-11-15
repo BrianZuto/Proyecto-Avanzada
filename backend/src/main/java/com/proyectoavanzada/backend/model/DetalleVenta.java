@@ -1,5 +1,7 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -17,16 +19,18 @@ public class DetalleVenta {
     @NotNull(message = "La venta es obligatoria")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venta_id", nullable = false)
+    @JsonIgnore
     private Venta venta;
     
     @NotNull(message = "El producto es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id", nullable = false)
+    @JsonIgnore
     private Producto producto;
     
-    @NotNull(message = "La presentación es obligatoria")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "presentacion_id", nullable = false)
+    @JoinColumn(name = "presentacion_id", nullable = true)
+    @JsonIgnore
     private Presentacion presentacion;
     
     @Positive(message = "La cantidad debe ser mayor a 0")
@@ -169,6 +173,46 @@ public class DetalleVenta {
         if (presentacion != null && cantidad != null) {
             int nuevoStock = presentacion.getStockDisponible() + cantidad;
             presentacion.setStockDisponible(nuevoStock);
+        }
+    }
+    
+    // Getters y Setters para IDs (para facilitar la deserialización desde el frontend)
+    @JsonProperty("ventaId")
+    public Long getVentaId() {
+        return venta != null ? venta.getId() : null;
+    }
+    
+    @JsonProperty("ventaId")
+    public void setVentaId(Long ventaId) {
+        if (ventaId != null) {
+            this.venta = new Venta();
+            this.venta.setId(ventaId);
+        }
+    }
+    
+    @JsonProperty("productoId")
+    public Long getProductoId() {
+        return producto != null ? producto.getId() : null;
+    }
+    
+    @JsonProperty("productoId")
+    public void setProductoId(Long productoId) {
+        if (productoId != null) {
+            this.producto = new Producto();
+            this.producto.setId(productoId);
+        }
+    }
+    
+    @JsonProperty("presentacionId")
+    public Long getPresentacionId() {
+        return presentacion != null ? presentacion.getId() : null;
+    }
+    
+    @JsonProperty("presentacionId")
+    public void setPresentacionId(Long presentacionId) {
+        if (presentacionId != null) {
+            this.presentacion = new Presentacion();
+            this.presentacion.setId(presentacionId);
         }
     }
 }

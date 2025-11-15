@@ -1,5 +1,5 @@
 # Dockerfile para el backend Spring Boot
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 # Metadatos
 LABEL maintainer="Proyecto Avanzada"

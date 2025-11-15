@@ -4,6 +4,8 @@ import com.proyectoavanzada.backend.model.Producto;
 import com.proyectoavanzada.backend.model.Categoria;
 import com.proyectoavanzada.backend.model.Marca;
 import com.proyectoavanzada.backend.repository.ProductoRepository;
+import com.proyectoavanzada.backend.repository.CategoriaRepository;
+import com.proyectoavanzada.backend.repository.MarcaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,12 @@ public class ProductoService {
     
     @Autowired
     private ProductoRepository productoRepository;
+    
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+    
+    @Autowired
+    private MarcaRepository marcaRepository;
     
     /**
      * Obtener todos los productos
@@ -206,6 +214,24 @@ public class ProductoService {
      * Guardar producto
      */
     public Producto guardarProducto(Producto producto) {
+        // Cargar categoría desde la base de datos si solo se proporciona el ID
+        if (producto.getCategoria() != null && producto.getCategoria().getId() != null) {
+            Categoria categoria = categoriaRepository.findById(producto.getCategoria().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + producto.getCategoria().getId()));
+            producto.setCategoria(categoria);
+        } else if (producto.getCategoria() == null) {
+            throw new RuntimeException("La categoría es obligatoria");
+        }
+        
+        // Cargar marca desde la base de datos si solo se proporciona el ID
+        if (producto.getMarca() != null && producto.getMarca().getId() != null) {
+            Marca marca = marcaRepository.findById(producto.getMarca().getId())
+                    .orElseThrow(() -> new RuntimeException("Marca no encontrada con ID: " + producto.getMarca().getId()));
+            producto.setMarca(marca);
+        } else if (producto.getMarca() == null) {
+            throw new RuntimeException("La marca es obligatoria");
+        }
+        
         // Verificar si el código de producto ya existe
         if (producto.getCodigoProducto() != null && productoRepository.existsByCodigoProducto(producto.getCodigoProducto())) {
             throw new RuntimeException("Ya existe un producto con este código");
@@ -223,22 +249,60 @@ public class ProductoService {
      * Actualizar producto
      */
     public Producto actualizarProducto(Producto producto) {
-        if (!productoRepository.existsById(producto.getId())) {
+        Optional<Producto> productoExistenteOpt = productoRepository.findById(producto.getId());
+        if (!productoExistenteOpt.isPresent()) {
             throw new RuntimeException("Producto no encontrado");
+        }
+        
+        Producto productoExistente = productoExistenteOpt.get();
+        
+        // Cargar categoría desde la base de datos si solo se proporciona el ID
+        if (producto.getCategoria() != null && producto.getCategoria().getId() != null) {
+            Categoria categoria = categoriaRepository.findById(producto.getCategoria().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + producto.getCategoria().getId()));
+            productoExistente.setCategoria(categoria);
+        }
+        
+        // Cargar marca desde la base de datos si solo se proporciona el ID
+        if (producto.getMarca() != null && producto.getMarca().getId() != null) {
+            Marca marca = marcaRepository.findById(producto.getMarca().getId())
+                    .orElseThrow(() -> new RuntimeException("Marca no encontrada con ID: " + producto.getMarca().getId()));
+            productoExistente.setMarca(marca);
+        }
+        
+        // Actualizar otros campos
+        if (producto.getNombre() != null) {
+            productoExistente.setNombre(producto.getNombre());
+        }
+        if (producto.getDescripcion() != null) {
+            productoExistente.setDescripcion(producto.getDescripcion());
+        }
+        if (producto.getPrecioVenta() != null) {
+            productoExistente.setPrecioVenta(producto.getPrecioVenta());
+        }
+        if (producto.getPrecioCompra() != null) {
+            productoExistente.setPrecioCompra(producto.getPrecioCompra());
+        }
+        if (producto.getImagenPrincipal() != null) {
+            productoExistente.setImagenPrincipal(producto.getImagenPrincipal());
+        }
+        if (producto.getActivo() != null) {
+            productoExistente.setActivo(producto.getActivo());
         }
         
         // Verificar si el código de producto ya existe en otro producto
         if (producto.getCodigoProducto() != null) {
-            Optional<Producto> productoExistente = productoRepository.findByCodigoProducto(producto.getCodigoProducto());
-            if (productoExistente.isPresent() && !productoExistente.get().getId().equals(producto.getId())) {
+            Optional<Producto> productoConCodigo = productoRepository.findByCodigoProducto(producto.getCodigoProducto());
+            if (productoConCodigo.isPresent() && !productoConCodigo.get().getId().equals(producto.getId())) {
                 throw new RuntimeException("Ya existe un producto con este código");
             }
+            productoExistente.setCodigoProducto(producto.getCodigoProducto());
         }
         
         // Actualizar fecha de modificación
-        producto.setFechaActualizacion(LocalDateTime.now());
+        productoExistente.setFechaActualizacion(LocalDateTime.now());
         
-        return productoRepository.save(producto);
+        return productoRepository.save(productoExistente);
     }
     
     /**

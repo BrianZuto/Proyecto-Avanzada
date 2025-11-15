@@ -76,15 +76,38 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Buscar usuario por email
-            Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorEmail(loginRequest.getEmail());
+            // Validar que el email y password no estén vacíos
+            if (loginRequest.getEmail() == null || loginRequest.getEmail().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "El email es obligatorio");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            if (loginRequest.getPassword() == null || loginRequest.getPassword().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "La contraseña es obligatoria");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            // Normalizar email a minúsculas (igual que en registro)
+            String emailNormalizado = loginRequest.getEmail().trim().toLowerCase();
+            
+            // Buscar usuario por email normalizado
+            Optional<Usuario> usuarioOpt = usuarioService.obtenerUsuarioPorEmail(emailNormalizado);
             
             if (usuarioOpt.isPresent()) {
                 Usuario usuario = usuarioOpt.get();
                 
+                // Verificar que el usuario tenga contraseña
+                if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+                    response.put("success", false);
+                    response.put("message", "Error: Usuario sin contraseña configurada");
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                }
+                
                 // Verificar contraseña usando BCrypt
                 if (usuarioService.verificarContraseña(loginRequest.getPassword(), usuario.getPassword())) {
-                    if (usuario.getActivo()) {
+                    if (usuario.getActivo() != null && usuario.getActivo()) {
                         // Login exitoso
                         response.put("success", true);
                         response.put("message", "Login exitoso");
@@ -99,17 +122,28 @@ public class AuthController {
                     }
                 } else {
                     response.put("success", false);
-                    response.put("message", "Contraseña incorrecta");
+                    response.put("message", "Credenciales incorrectas");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 }
             } else {
                 response.put("success", false);
-                response.put("message", "Usuario no encontrado");
+                response.put("message", "Credenciales incorrectas");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
+            e.printStackTrace(); // Log del error en consola
+            System.err.println("ERROR EN LOGIN:");
+            System.err.println("Email: " + (loginRequest != null ? loginRequest.getEmail() : "null"));
+            System.err.println("Error: " + e.getClass().getName());
+            System.err.println("Mensaje: " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("Causa: " + e.getCause().getMessage());
+            }
             response.put("success", false);
-            response.put("message", "Error interno del servidor");
+            response.put("message", "Error interno del servidor: " + e.getMessage());
+            if (e.getCause() != null) {
+                response.put("cause", e.getCause().getMessage());
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -156,8 +190,37 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // Verificar si el email ya existe
-            if (usuarioService.existeUsuarioConEmail(registerRequest.getEmail())) {
+            // Validar campos requeridos
+            if (registerRequest.getNombre() == null || registerRequest.getNombre().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "El nombre es obligatorio");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            if (registerRequest.getEmail() == null || registerRequest.getEmail().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "El email es obligatorio");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            if (registerRequest.getPassword() == null || registerRequest.getPassword().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "La contraseña es obligatoria");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            // Validar longitud mínima de contraseña
+            if (registerRequest.getPassword().length() < 6) {
+                response.put("success", false);
+                response.put("message", "La contraseña debe tener al menos 6 caracteres");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            
+            // Normalizar email
+            String emailNormalizado = registerRequest.getEmail().trim().toLowerCase();
+            
+            // Verificar si el email ya existe (buscando con el email normalizado)
+            if (usuarioService.existeUsuarioConEmail(emailNormalizado)) {
                 response.put("success", false);
                 response.put("message", "El email ya está registrado");
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
@@ -165,13 +228,37 @@ public class AuthController {
             
             // Crear nuevo usuario
             Usuario nuevoUsuario = new Usuario();
-            nuevoUsuario.setNombre(registerRequest.getNombre());
-            nuevoUsuario.setEmail(registerRequest.getEmail());
+            nuevoUsuario.setNombre(registerRequest.getNombre().trim());
+            nuevoUsuario.setEmail(emailNormalizado);
             nuevoUsuario.setPassword(registerRequest.getPassword()); // Se encriptará automáticamente en guardarUsuario()
             nuevoUsuario.setActivo(true);
+            nuevoUsuario.setRol("Usuario"); // Rol por defecto
             
             // Guardar usuario
-            Usuario usuarioGuardado = usuarioService.guardarUsuario(nuevoUsuario);
+            Usuario usuarioGuardado;
+            try {
+                usuarioGuardado = usuarioService.guardarUsuario(nuevoUsuario);
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                // Error de integridad de datos (email duplicado, etc.)
+                e.printStackTrace();
+                if (e.getMessage() != null && e.getMessage().contains("email")) {
+                    response.put("success", false);
+                    response.put("message", "El email ya está registrado");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+                }
+                response.put("success", false);
+                response.put("message", "Error de integridad de datos: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            } catch (jakarta.validation.ConstraintViolationException e) {
+                // Error de validación
+                e.printStackTrace();
+                response.put("success", false);
+                response.put("message", "Error de validación: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e; // Re-lanzar para que se capture en el catch general
+            }
             
             response.put("success", true);
             response.put("message", "Usuario registrado exitosamente");
@@ -181,9 +268,23 @@ public class AuthController {
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
             
-        } catch (Exception e) {
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            e.printStackTrace();
             response.put("success", false);
-            response.put("message", "Error al registrar usuario");
+            response.put("message", "Error de integridad de datos: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (jakarta.validation.ConstraintViolationException e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "Error de validación: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log del error en consola
+            response.put("success", false);
+            response.put("message", "Error al registrar usuario: " + e.getMessage());
+            if (e.getCause() != null) {
+                response.put("cause", e.getCause().getMessage());
+            }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

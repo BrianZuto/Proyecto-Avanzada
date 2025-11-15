@@ -19,9 +19,8 @@ public class Inventario {
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
     
-    @NotNull(message = "La presentación es obligatoria")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "presentacion_id", nullable = false)
+    @JoinColumn(name = "presentacion_id", nullable = true)
     private Presentacion presentacion;
     
     @PositiveOrZero(message = "El stock debe ser mayor o igual a 0")

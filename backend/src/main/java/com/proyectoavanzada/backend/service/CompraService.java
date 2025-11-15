@@ -1,20 +1,24 @@
 package com.proyectoavanzada.backend.service;
 
-import com.proyectoavanzada.backend.model.Compra;
-import com.proyectoavanzada.backend.model.DetalleCompra;
-import com.proyectoavanzada.backend.model.Proveedor;
-import com.proyectoavanzada.backend.model.Usuario;
-import com.proyectoavanzada.backend.model.Presentacion;
-import com.proyectoavanzada.backend.repository.CompraRepository;
-import com.proyectoavanzada.backend.repository.DetalleCompraRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.proyectoavanzada.backend.model.Compra;
+import com.proyectoavanzada.backend.model.DetalleCompra;
+import com.proyectoavanzada.backend.model.Producto;
+import com.proyectoavanzada.backend.model.Proveedor;
+import com.proyectoavanzada.backend.model.Usuario;
+import com.proyectoavanzada.backend.repository.CompraRepository;
+import com.proyectoavanzada.backend.repository.DetalleCompraRepository;
+import com.proyectoavanzada.backend.repository.ProductoRepository;
+import com.proyectoavanzada.backend.repository.ProveedorRepository;
+import com.proyectoavanzada.backend.repository.UsuarioRepository;
 
 @Service
 @Transactional
@@ -28,6 +32,18 @@ public class CompraService {
     
     @Autowired
     private PresentacionService presentacionService;
+    
+    @Autowired
+    private InventarioService inventarioService;
+    
+    @Autowired
+    private ProveedorRepository proveedorRepository;
+    
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    
+    @Autowired
+    private ProductoRepository productoRepository;
     
     /**
      * Obtener todas las compras
@@ -173,6 +189,24 @@ public class CompraService {
      * Crear nueva compra
      */
     public Compra crearCompra(Compra compra) {
+        // Cargar proveedor desde la base de datos si solo se proporciona el ID
+        if (compra.getProveedor() != null && compra.getProveedor().getId() != null) {
+            Proveedor proveedor = proveedorRepository.findById(compra.getProveedor().getId())
+                    .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + compra.getProveedor().getId()));
+            compra.setProveedor(proveedor);
+        } else if (compra.getProveedor() == null) {
+            throw new RuntimeException("El proveedor es obligatorio");
+        }
+        
+        // Cargar usuario desde la base de datos si solo se proporciona el ID
+        if (compra.getUsuario() != null && compra.getUsuario().getId() != null) {
+            Usuario usuario = usuarioRepository.findById(compra.getUsuario().getId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + compra.getUsuario().getId()));
+            compra.setUsuario(usuario);
+        } else if (compra.getUsuario() == null) {
+            throw new RuntimeException("El usuario es obligatorio");
+        }
+        
         // Generar número de factura si no se proporciona
         if (compra.getNumeroFactura() == null || compra.getNumeroFactura().isEmpty()) {
             compra.setNumeroFactura(generarNumeroFactura());
@@ -183,12 +217,93 @@ public class CompraService {
             throw new RuntimeException("Ya existe una compra con este número de factura");
         }
         
+        // Establecer fecha de compra si no se proporciona
+        if (compra.getFechaCompra() == null) {
+            compra.setFechaCompra(LocalDateTime.now());
+        }
+        
         // Calcular fecha de vencimiento si no se proporciona
         if (compra.getFechaVencimiento() == null && compra.getProveedor().getCreditoDias() != null) {
             compra.setFechaVencimiento(compra.getFechaCompra().plusDays(compra.getProveedor().getCreditoDias()));
         }
         
-        return compraRepository.save(compra);
+        // Asegurar que descuento e impuesto estén establecidos
+        if (compra.getDescuento() == null) {
+            compra.setDescuento(BigDecimal.ZERO);
+        }
+        if (compra.getImpuesto() == null) {
+            compra.setImpuesto(BigDecimal.ZERO);
+        }
+        
+        // Si el subtotal no está establecido, establecerlo en 0 temporalmente
+        // Se recalculará después de guardar los detalles
+        if (compra.getSubtotal() == null) {
+            compra.setSubtotal(BigDecimal.ZERO);
+        }
+        
+        // Calcular total inicial (se recalculará después)
+        compra.calcularTotal();
+        
+        // Procesar detalles ANTES de guardar la compra
+        System.out.println("=== PROCESANDO DETALLES ===");
+        System.out.println("Detalles recibidos: " + (compra.getDetallesCompra() != null ? compra.getDetallesCompra().size() : 0));
+        
+        if (compra.getDetallesCompra() != null && !compra.getDetallesCompra().isEmpty()) {
+            System.out.println("Iniciando procesamiento de " + compra.getDetallesCompra().size() + " detalles");
+            
+            // Procesar cada detalle: cargar producto y establecer la compra
+            for (DetalleCompra detalle : compra.getDetallesCompra()) {
+                System.out.println("--- Procesando detalle ---");
+                System.out.println("Producto ID en detalle: " + (detalle.getProducto() != null ? detalle.getProducto().getId() : "NULL"));
+                System.out.println("Cantidad: " + detalle.getCantidad());
+                
+                // ESTABLECER LA COMPRA EN EL DETALLE (necesario para la validación @NotNull)
+                detalle.setCompra(compra);
+                System.out.println("Compra establecida en detalle");
+                
+                // Cargar producto desde la base de datos si solo se proporciona el ID
+                if (detalle.getProducto() != null && detalle.getProducto().getId() != null) {
+                    Producto producto = productoRepository.findById(detalle.getProducto().getId())
+                            .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + detalle.getProducto().getId()));
+                    detalle.setProducto(producto);
+                    System.out.println("Producto cargado: " + producto.getNombre());
+                } else if (detalle.getProducto() == null) {
+                    throw new RuntimeException("El producto es obligatorio en el detalle");
+                }
+                
+                // Calcular subtotal
+                detalle.calcularSubtotal();
+                System.out.println("Subtotal calculado: " + detalle.getSubtotal());
+            }
+        }
+        
+        // Guardar la compra con todos los detalles (la cascada los guardará automáticamente)
+        System.out.println("=== GUARDANDO COMPRA CON DETALLES ===");
+        Compra compraGuardada = compraRepository.saveAndFlush(compra);
+        System.out.println("Compra guardada con ID: " + compraGuardada.getId());
+        System.out.println("Número de factura: " + compraGuardada.getNumeroFactura());
+        
+        // Actualizar stock después de guardar (necesitamos los detalles guardados)
+        if (compraGuardada.getDetallesCompra() != null && !compraGuardada.getDetallesCompra().isEmpty()) {
+            System.out.println("=== ACTUALIZANDO STOCK PARA " + compraGuardada.getDetallesCompra().size() + " DETALLES ===");
+            for (DetalleCompra detalle : compraGuardada.getDetallesCompra()) {
+                System.out.println("Actualizando stock para producto ID: " + detalle.getProducto().getId() + ", Cantidad: " + detalle.getCantidad());
+                actualizarStockCompra(detalle);
+                System.out.println("Stock actualizado para producto ID: " + detalle.getProducto().getId());
+            }
+        }
+        
+        // Recalcular totales después de guardar todos los detalles
+        System.out.println("=== RECALCULANDO TOTALES ===");
+        recalcularTotalesCompra(compraGuardada.getId());
+        
+        // Recargar la compra con los totales actualizados
+        compraGuardada = compraRepository.findById(compraGuardada.getId())
+                .orElseThrow(() -> new RuntimeException("Error al recargar la compra después de guardar los detalles"));
+        
+        System.out.println("Compra recargada - Subtotal: " + compraGuardada.getSubtotal() + ", Total: " + compraGuardada.getTotal());
+        
+        return compraGuardada;
     }
     
     /**
@@ -348,13 +463,38 @@ public class CompraService {
             Compra compra = compraOpt.get();
             List<DetalleCompra> detalles = detalleCompraRepository.findByCompra(compra);
             
+            // Calcular subtotal sumando todos los subtotales de los detalles
             BigDecimal subtotal = detalles.stream()
-                    .map(DetalleCompra::getSubtotal)
+                    .map(detalle -> {
+                        if (detalle.getSubtotal() != null) {
+                            return detalle.getSubtotal();
+                        } else {
+                            // Si el subtotal no está calculado, calcularlo
+                            detalle.calcularSubtotal();
+                            return detalle.getSubtotal();
+                        }
+                    })
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             
+            System.out.println("Subtotal calculado: " + subtotal);
             compra.setSubtotal(subtotal);
+            
+            // Asegurar que descuento e impuesto estén establecidos
+            if (compra.getDescuento() == null) {
+                compra.setDescuento(BigDecimal.ZERO);
+            }
+            if (compra.getImpuesto() == null) {
+                compra.setImpuesto(BigDecimal.ZERO);
+            }
+            
+            System.out.println("Descuento: " + compra.getDescuento() + ", Impuesto: " + compra.getImpuesto());
+            
+            // Calcular el total final (subtotal - descuento + impuesto)
             compra.calcularTotal();
+            System.out.println("Total calculado: " + compra.getTotal());
+            
             compraRepository.save(compra);
+            System.out.println("Compra guardada con total: " + compra.getTotal());
         }
     }
     
@@ -362,8 +502,34 @@ public class CompraService {
      * Actualizar stock al agregar compra
      */
     private void actualizarStockCompra(DetalleCompra detalleCompra) {
-        Presentacion presentacion = detalleCompra.getPresentacion();
-        presentacionService.agregarStock(presentacion.getId(), detalleCompra.getCantidad());
+        System.out.println("=== INICIANDO actualizarStockCompra ===");
+        System.out.println("Presentación: " + (detalleCompra.getPresentacion() != null ? detalleCompra.getPresentacion().getId() : "NULL"));
+        System.out.println("Producto: " + (detalleCompra.getProducto() != null ? detalleCompra.getProducto().getId() : "NULL"));
+        System.out.println("Cantidad: " + detalleCompra.getCantidad());
+        
+        try {
+            if (detalleCompra.getPresentacion() != null) {
+                System.out.println("Actualizando stock de presentación");
+                // Si hay presentación, actualizar stock de la presentación
+                presentacionService.agregarStock(detalleCompra.getPresentacion().getId(), detalleCompra.getCantidad());
+            } else {
+                System.out.println("Actualizando stock de producto (sin presentación)");
+                // Si no hay presentación, actualizar stock directamente del producto
+                if (detalleCompra.getProducto() != null && detalleCompra.getProducto().getId() != null) {
+                    System.out.println("Llamando a inventarioService.agregarStockProducto con ID: " + detalleCompra.getProducto().getId());
+                    inventarioService.agregarStockProducto(detalleCompra.getProducto().getId(), detalleCompra.getCantidad());
+                    System.out.println("inventarioService.agregarStockProducto completado");
+                } else {
+                    System.err.println("ERROR: Producto es NULL o no tiene ID");
+                    throw new RuntimeException("No se puede actualizar el stock: el producto no está definido en el detalle");
+                }
+            }
+            System.out.println("=== actualizarStockCompra completado exitosamente ===");
+        } catch (Exception e) {
+            System.err.println("ERROR en actualizarStockCompra: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al actualizar el stock del producto: " + e.getMessage(), e);
+        }
     }
     
     /**
@@ -380,8 +546,13 @@ public class CompraService {
      * Revertir stock de un detalle de compra
      */
     private void revertirStockDetalleCompra(DetalleCompra detalleCompra) {
-        Presentacion presentacion = detalleCompra.getPresentacion();
-        presentacionService.reducirStock(presentacion.getId(), detalleCompra.getCantidad());
+        if (detalleCompra.getPresentacion() != null) {
+            // Si hay presentación, revertir stock de la presentación
+            presentacionService.reducirStock(detalleCompra.getPresentacion().getId(), detalleCompra.getCantidad());
+        } else {
+            // Si no hay presentación, revertir stock directamente del producto
+            inventarioService.reducirStockProducto(detalleCompra.getProducto().getId(), detalleCompra.getCantidad());
+        }
     }
     
     /**

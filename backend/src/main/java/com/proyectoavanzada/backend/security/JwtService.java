@@ -69,8 +69,24 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            // Intentar decodificar como BASE64
+            byte[] keyBytes = Decoders.BASE64.decode(secret);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            // Si falla, usar el secret directamente como string (para secretos que no son BASE64)
+            // Necesitamos al menos 256 bits (32 bytes) para HS256
+            String secretKey = secret;
+            if (secretKey.length() < 32) {
+                // Repetir el secret hasta tener al menos 32 caracteres
+                while (secretKey.length() < 32) {
+                    secretKey += secret;
+                }
+            }
+            // Tomar los primeros 32 bytes
+            byte[] keyBytes = secretKey.substring(0, Math.min(32, secretKey.length())).getBytes();
+            return Keys.hmacShaKeyFor(keyBytes);
+        }
     }
 }
 

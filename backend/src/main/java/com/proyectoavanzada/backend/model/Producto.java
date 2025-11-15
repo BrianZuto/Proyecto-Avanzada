@@ -1,5 +1,6 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,12 +31,12 @@ public class Producto {
     private String codigoProducto;
     
     @NotNull(message = "La categoría es obligatoria")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
     
     @NotNull(message = "La marca es obligatoria")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "marca_id", nullable = false)
     private Marca marca;
     
@@ -97,15 +98,19 @@ public class Producto {
     
     // Relaciones
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Presentacion> presentaciones;
     
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<DetalleCompra> detallesCompra;
     
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<DetalleVenta> detallesVenta;
     
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Inventario> inventarios;
     
     // Constructores
@@ -163,12 +168,22 @@ public class Producto {
         this.categoria = categoria;
     }
     
+    // Getter para obtener el ID de la categoría sin serializar el objeto completo
+    public Long getCategoriaId() {
+        return categoria != null ? categoria.getId() : null;
+    }
+    
     public Marca getMarca() {
         return marca;
     }
     
     public void setMarca(Marca marca) {
         this.marca = marca;
+    }
+    
+    // Getter para obtener el ID de la marca sin serializar el objeto completo
+    public Long getMarcaId() {
+        return marca != null ? marca.getId() : null;
     }
     
     public BigDecimal getPrecioVenta() {

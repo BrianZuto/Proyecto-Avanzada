@@ -281,12 +281,26 @@ public class CompraController {
     public ResponseEntity<Map<String, Object>> crearCompra(@Valid @RequestBody Compra compra) {
         Map<String, Object> response = new HashMap<>();
         try {
+            System.out.println("=== RECIBIENDO COMPRA EN CONTROLLER ===");
+            System.out.println("Proveedor ID: " + (compra.getProveedor() != null ? compra.getProveedor().getId() : "NULL"));
+            System.out.println("Usuario ID: " + (compra.getUsuario() != null ? compra.getUsuario().getId() : "NULL"));
+            System.out.println("Detalles recibidos: " + (compra.getDetallesCompra() != null ? compra.getDetallesCompra().size() : 0));
+            if (compra.getDetallesCompra() != null && !compra.getDetallesCompra().isEmpty()) {
+                for (int i = 0; i < compra.getDetallesCompra().size(); i++) {
+                    DetalleCompra det = compra.getDetallesCompra().get(i);
+                    System.out.println("Detalle " + i + ": Producto ID=" + (det.getProducto() != null ? det.getProducto().getId() : "NULL") + 
+                                     ", Cantidad=" + det.getCantidad());
+                }
+            }
+            
             Compra compraGuardada = compraService.crearCompra(compra);
             response.put("success", true);
             response.put("message", "Compra creada exitosamente");
             response.put("data", compraGuardada);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            System.err.println("ERROR en crearCompra: " + e.getMessage());
+            e.printStackTrace();
             response.put("success", false);
             response.put("message", "Error al crear compra: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

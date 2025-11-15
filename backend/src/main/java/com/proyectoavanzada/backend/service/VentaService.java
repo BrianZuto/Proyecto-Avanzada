@@ -1,20 +1,23 @@
 package com.proyectoavanzada.backend.service;
 
-import com.proyectoavanzada.backend.model.Venta;
-import com.proyectoavanzada.backend.model.DetalleVenta;
-import com.proyectoavanzada.backend.model.Cliente;
-import com.proyectoavanzada.backend.model.Usuario;
-import com.proyectoavanzada.backend.model.Presentacion;
-import com.proyectoavanzada.backend.repository.VentaRepository;
-import com.proyectoavanzada.backend.repository.DetalleVentaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.proyectoavanzada.backend.model.Cliente;
+import com.proyectoavanzada.backend.model.DetalleVenta;
+import com.proyectoavanzada.backend.model.Producto;
+import com.proyectoavanzada.backend.model.Usuario;
+import com.proyectoavanzada.backend.model.Venta;
+import com.proyectoavanzada.backend.repository.DetalleVentaRepository;
+import com.proyectoavanzada.backend.repository.ProductoRepository;
+import com.proyectoavanzada.backend.repository.UsuarioRepository;
+import com.proyectoavanzada.backend.repository.VentaRepository;
 
 @Service
 @Transactional
@@ -26,11 +29,20 @@ public class VentaService {
     @Autowired
     private DetalleVentaRepository detalleVentaRepository;
     
-    @Autowired
+    @Autowired(required = false)
     private PresentacionService presentacionService;
     
     @Autowired
+    private InventarioService inventarioService;
+    
+    @Autowired
     private ClienteService clienteService;
+    
+    @Autowired
+    private ProductoRepository productoRepository;
+    
+    @Autowired
+    private UsuarioRepository usuarioRepository;
     
     /**
      * Obtener todas las ventas
@@ -211,6 +223,24 @@ public class VentaService {
      * Crear nueva venta
      */
     public Venta crearVenta(Venta venta) {
+        // Cargar usuario desde la base de datos si solo se proporciona el ID
+        Long usuarioId = null;
+        if (venta.getUsuario() != null && venta.getUsuario().getId() != null) {
+            usuarioId = venta.getUsuario().getId();
+        } else {
+            // Intentar obtener el ID desde el método getUsuarioId()
+            usuarioId = venta.getUsuarioId();
+        }
+        
+        final Long finalUsuarioId = usuarioId;
+        if (finalUsuarioId != null) {
+            Usuario usuario = usuarioRepository.findById(finalUsuarioId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + finalUsuarioId));
+            venta.setUsuario(usuario);
+        } else {
+            throw new RuntimeException("El usuario es obligatorio para crear una venta");
+        }
+        
         // Generar número de venta si no se proporciona
         if (venta.getNumeroVenta() == null || venta.getNumeroVenta().isEmpty()) {
             venta.setNumeroVenta(generarNumeroVenta());
@@ -221,7 +251,69 @@ public class VentaService {
             throw new RuntimeException("Ya existe una venta con este número");
         }
         
-        return ventaRepository.save(venta);
+        // Validar que el subtotal y total sean positivos
+        if (venta.getSubtotal() == null || venta.getSubtotal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("El subtotal debe ser mayor a 0");
+        }
+        if (venta.getTotal() == null || venta.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("El total debe ser mayor a 0");
+        }
+        
+        // Procesar detalles antes de guardar
+        if (venta.getDetallesVenta() == null || venta.getDetallesVenta().isEmpty()) {
+            throw new RuntimeException("La venta debe tener al menos un detalle");
+        }
+        
+        for (DetalleVenta detalle : venta.getDetallesVenta()) {
+            // Validar cantidad y precio unitario
+            if (detalle.getCantidad() == null || detalle.getCantidad() <= 0) {
+                throw new RuntimeException("La cantidad debe ser mayor a 0 para cada detalle");
+            }
+            if (detalle.getPrecioUnitario() == null || detalle.getPrecioUnitario().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("El precio unitario debe ser mayor a 0 para cada detalle");
+            }
+            
+            // Cargar producto desde la base de datos si solo se proporciona el ID
+            Long productoId = null;
+            if (detalle.getProducto() != null && detalle.getProducto().getId() != null) {
+                productoId = detalle.getProducto().getId();
+            } else {
+                // Intentar obtener el ID desde el método getProductoId()
+                productoId = detalle.getProductoId();
+            }
+            
+            final Long finalProductoId = productoId;
+            if (finalProductoId == null) {
+                throw new RuntimeException("El producto es obligatorio para cada detalle de venta");
+            }
+            
+            Producto producto = productoRepository.findById(finalProductoId)
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + finalProductoId));
+            detalle.setProducto(producto);
+            
+            // Establecer la venta en el detalle
+            detalle.setVenta(venta);
+            
+            // Calcular subtotal
+            detalle.calcularSubtotal();
+        }
+        
+        // Guardar la venta con todos los detalles (la cascada los guardará automáticamente)
+        Venta ventaGuardada = ventaRepository.saveAndFlush(venta);
+        
+        // Actualizar stock después de guardar
+        if (ventaGuardada.getDetallesVenta() != null && !ventaGuardada.getDetallesVenta().isEmpty()) {
+            for (DetalleVenta detalle : ventaGuardada.getDetallesVenta()) {
+                actualizarStockVenta(detalle);
+            }
+        }
+        
+        // Recalcular totales
+        recalcularTotalesVenta(ventaGuardada.getId());
+        
+        // Recargar la venta con los totales actualizados
+        return ventaRepository.findById(ventaGuardada.getId())
+                .orElseThrow(() -> new RuntimeException("Error al recargar la venta después de guardar"));
     }
     
     /**
@@ -370,9 +462,17 @@ public class VentaService {
             throw new RuntimeException("Venta no encontrada");
         }
         
-        // Verificar que hay stock suficiente
-        if (!detalleVenta.hayStockSuficiente()) {
+        // Verificar que hay stock suficiente (solo si hay presentación)
+        if (detalleVenta.getPresentacion() != null && !detalleVenta.hayStockSuficiente()) {
             throw new RuntimeException("Stock insuficiente para el producto: " + detalleVenta.getProducto().getNombre());
+        }
+        
+        // Si no hay presentación, verificar stock del producto directamente
+        if (detalleVenta.getPresentacion() == null && detalleVenta.getProducto() != null && detalleVenta.getProducto().getId() != null) {
+            Integer stockDisponible = inventarioService.obtenerStockProducto(detalleVenta.getProducto().getId());
+            if (stockDisponible < detalleVenta.getCantidad()) {
+                throw new RuntimeException("Stock insuficiente para el producto: " + detalleVenta.getProducto().getNombre());
+            }
         }
         
         // Calcular subtotal
@@ -476,8 +576,19 @@ public class VentaService {
      * Actualizar stock al agregar venta
      */
     private void actualizarStockVenta(DetalleVenta detalleVenta) {
-        Presentacion presentacion = detalleVenta.getPresentacion();
-        presentacionService.reducirStock(presentacion.getId(), detalleVenta.getCantidad());
+        if (detalleVenta.getPresentacion() != null) {
+            // Si hay presentación, actualizar stock de la presentación
+            if (presentacionService != null) {
+                presentacionService.reducirStock(detalleVenta.getPresentacion().getId(), detalleVenta.getCantidad());
+            }
+        } else {
+            // Si no hay presentación, actualizar stock directamente del producto
+            if (detalleVenta.getProducto() != null && detalleVenta.getProducto().getId() != null) {
+                inventarioService.reducirStockProducto(detalleVenta.getProducto().getId(), detalleVenta.getCantidad());
+            } else {
+                throw new RuntimeException("No se puede actualizar el stock: el producto no está definido en el detalle");
+            }
+        }
     }
     
     /**
@@ -494,8 +605,19 @@ public class VentaService {
      * Revertir stock de un detalle de venta
      */
     private void revertirStockDetalleVenta(DetalleVenta detalleVenta) {
-        Presentacion presentacion = detalleVenta.getPresentacion();
-        presentacionService.agregarStock(presentacion.getId(), detalleVenta.getCantidad());
+        if (detalleVenta.getPresentacion() != null) {
+            // Si hay presentación, revertir stock de la presentación
+            if (presentacionService != null) {
+                presentacionService.agregarStock(detalleVenta.getPresentacion().getId(), detalleVenta.getCantidad());
+            }
+        } else {
+            // Si no hay presentación, revertir stock directamente del producto
+            if (detalleVenta.getProducto() != null && detalleVenta.getProducto().getId() != null) {
+                inventarioService.agregarStockProducto(detalleVenta.getProducto().getId(), detalleVenta.getCantidad());
+            } else {
+                throw new RuntimeException("No se puede revertir el stock: el producto no está definido en el detalle");
+            }
+        }
     }
     
     /**

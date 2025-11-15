@@ -1,5 +1,8 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,11 +24,13 @@ public class Venta {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
+    @JsonIgnore
     private Cliente cliente;
     
     @NotNull(message = "El usuario vendedor es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
     
     @Column(name = "fecha_venta")
@@ -77,6 +82,7 @@ public class Venta {
     
     // Relaciones
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "venta"})
     private List<DetalleVenta> detallesVenta;
     
     // Constructores
@@ -306,5 +312,32 @@ public class Venta {
     @PreUpdate
     public void preUpdate() {
         this.fechaActualizacion = LocalDateTime.now();
+    }
+    
+    // Getters para IDs (para facilitar la deserialización desde el frontend)
+    @JsonProperty("usuarioId")
+    public Long getUsuarioId() {
+        return usuario != null ? usuario.getId() : null;
+    }
+    
+    @JsonProperty("usuarioId")
+    public void setUsuarioId(Long usuarioId) {
+        if (usuarioId != null) {
+            this.usuario = new Usuario();
+            this.usuario.setId(usuarioId);
+        }
+    }
+    
+    @JsonProperty("clienteId")
+    public Long getClienteId() {
+        return cliente != null ? cliente.getId() : null;
+    }
+    
+    @JsonProperty("clienteId")
+    public void setClienteId(Long clienteId) {
+        if (clienteId != null) {
+            this.cliente = new Cliente();
+            this.cliente.setId(clienteId);
+        }
     }
 }
