@@ -1,41 +1,186 @@
-<div class="panel">
-  <div class="panel-header">
-    <div class="panel-title">Gestión de Compras</div>
-    <button class="btn-primary-sm">
-      <i class="bi bi-plus"></i>
-      Agregar Compra
-    </button>
+<div class="compras-container">
+  <div class="compras-header">
+    <div class="header-left">
+      <h1 class="main-title">Gestión de Compras</h1>
+      <p class="subtitle">Administra las compras y actualiza el inventario</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-add btn-add-compra" (click)="abrirFormulario()">
+        <span class="plus-icon">+</span>
+        Agregar Compra
+      </button>
+    </div>
   </div>
 
-  <div class="table-wrapper">
-    <div class="table-row table-head">
-      <div class="col id">ID</div>
-      <div class="col proveedor">Proveedor</div>
-      <div class="col producto">Producto</div>
-      <div class="col cantidad">Cantidad</div>
-      <div class="col precio">Precio Total</div>
-      <div class="col fecha">Fecha</div>
-      <div class="col estado">Estado</div>
-      <div class="col acciones">Acciones</div>
-    </div>
+  <div class="table-container">
+    <table class="compras-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>N° Factura</th>
+          <th>Proveedor</th>
+          <th>Total</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let compra of compras">
+          <td class="id-cell">#{{ compra.id }}</td>
+          <td class="factura-cell">{{ compra.numeroFactura || 'N/A' }}</td>
+          <td class="proveedor-cell">{{ obtenerNombreProveedor(compra.proveedorId) }}</td>
+          <td class="total-cell">${{ formatearPrecio(compra.total || 0) }}</td>
+          <td class="fecha-cell">{{ formatearFecha(compra.fechaCompra) }}</td>
+          <td class="estado-cell">
+            <span class="badge" 
+                  [class.badge-pendiente]="compra.estado === 'PENDIENTE'"
+                  [class.badge-pagada]="compra.estado === 'PAGADA'"
+                  [class.badge-cancelada]="compra.estado === 'CANCELADA'">
+              {{ compra.estado }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button *ngIf="compra.estado === 'PENDIENTE'" 
+                    class="action-btn complete-btn" 
+                    title="Completar Compra" 
+                    (click)="completarCompra(compra.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.08 1.035l2.75 2.75a.75.75 0 0 0 1.08-.022l4-5a.75.75 0 0 0-.016-1.06z"/>
+              </svg>
+            </button>
+            <button *ngIf="compra.estado === 'PENDIENTE'" 
+                    class="action-btn cancel-btn" 
+                    title="Cancelar Compra" 
+                    (click)="cancelarCompra(compra.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+              </svg>
+            </button>
+            <button class="action-btn delete-btn" title="Eliminar" (click)="eliminarCompra(compra.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1 1v.5h4V2a1 1 0 0 1 1-1h2.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3V2h11v1z"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="compras.length === 0">
+          <td colspan="7" class="empty-cell">No hay compras registradas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-    <div class="table-row" *ngFor="let p of purchases">
-      <div class="col id">#{{ p.id }}</div>
-      <div class="col proveedor">{{ p.proveedor }}</div>
-      <div class="col producto">{{ p.producto }}</div>
-      <div class="col cantidad">{{ p.cantidad }}</div>
-      <div class="col precio">{{ p.precioTotal }}</div>
-      <div class="col fecha">{{ p.fecha }}</div>
-      <div class="col estado">
-        <span class="badge-state" [class.recibido]="p.estado==='Recibido'" [class.transito]="p.estado==='En tránsito'" [class.pendiente]="p.estado==='Pendiente'">{{ p.estado }}</span>
+  <!-- Modal de formulario de compra -->
+  <div class="modal-overlay" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editando ? 'Editar Compra' : 'Agregar Nueva Compra' }}</h2>
+        <button class="close-btn" (click)="cerrarFormulario()">×</button>
       </div>
-      <div class="col acciones">
-        <button class="icon" title="Ver"><i class="bi bi-eye"></i></button>
-        <button class="icon" title="Editar"><i class="bi bi-pencil"></i></button>
-        <button class="icon" title="Eliminar"><i class="bi bi-trash"></i></button>
-      </div>
+      <form class="compra-form" (ngSubmit)="guardarCompra()">
+        <div class="form-section">
+          <h3>Información de la Compra</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="proveedor">Proveedor *</label>
+              <select id="proveedor" [(ngModel)]="compraForm.proveedorId" name="proveedor" required>
+                <option [ngValue]="0" disabled>Seleccione un proveedor</option>
+                <option *ngFor="let prov of proveedores" [ngValue]="prov.id">{{ prov.nombre }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="estado">Estado</label>
+              <select id="estado" [(ngModel)]="compraForm.estado" name="estado">
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="PAGADA">Pagada</option>
+                <option value="CANCELADA">Cancelada</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="metodoPago">Método de Pago</label>
+              <select id="metodoPago" [(ngModel)]="compraForm.metodoPago" name="metodoPago">
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="TRANSFERENCIA">Transferencia</option>
+                <option value="TARJETA">Tarjeta</option>
+                <option value="CREDITO">Crédito</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="observaciones">Observaciones</label>
+              <input type="text" id="observaciones" [(ngModel)]="compraForm.observaciones" name="observaciones">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Productos de la Compra</h3>
+          <div class="detalle-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="producto">Producto *</label>
+                <select id="producto" [(ngModel)]="detalleForm.productoId" name="producto" (change)="onProductoSeleccionado()">
+                  <option [ngValue]="0" disabled>Seleccione un producto</option>
+                  <option *ngFor="let prod of productos" [ngValue]="prod.id">{{ prod.nombre }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="cantidad">Cantidad *</label>
+                <input type="number" id="cantidad" [(ngModel)]="detalleForm.cantidad" name="cantidad" min="1" required>
+              </div>
+              <div class="form-group">
+                <label for="precioUnitario">Precio Unitario *</label>
+                <input type="number" id="precioUnitario" [(ngModel)]="detalleForm.precioUnitario" name="precioUnitario" min="0" step="0.01" required>
+              </div>
+              <div class="form-group form-group-button">
+                <button type="button" class="btn-add-detalle" (click)="agregarDetalle()">Agregar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="detalles-list" *ngIf="detallesCompra.length > 0">
+            <table class="detalles-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unit.</th>
+                  <th>Subtotal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let detalle of detallesCompra; let i = index">
+                  <td>{{ obtenerNombreProducto(detalle.productoId) }}</td>
+                  <td>{{ detalle.cantidad }}</td>
+                  <td>${{ formatearPrecio(detalle.precioUnitario) }}</td>
+                  <td>${{ formatearPrecio(detalle.subtotal || 0) }}</td>
+                  <td>
+                    <button type="button" class="btn-remove" (click)="eliminarDetalle(i)">Eliminar</button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="total-label"><strong>Total:</strong></td>
+                  <td class="total-value"><strong>${{ formatearPrecio(calcularTotal()) }}</strong></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
+          <button type="submit" class="btn-save">{{ editando ? 'Actualizar' : 'Guardar Compra' }}</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-
-

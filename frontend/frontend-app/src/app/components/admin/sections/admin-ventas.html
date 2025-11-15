@@ -1,52 +1,164 @@
-<div class="grid">
-  <section class="card">
-    <div class="card-title">Ventas por Mes</div>
-    <div class="chart-placeholder">
-      <i class="bi bi-bar-chart"></i>
-      <span>Gráfico de ventas mensuales</span>
-    </div>
-  </section>
-
-  <section class="card">
-    <div class="card-title">Productos Más Vendidos</div>
-    <div class="top-products">
-      <div class="product-row" *ngFor="let p of topProducts">
-        <div class="rank">#{{ p.posicion }}</div>
-        <div class="info">
-          <div class="name">{{ p.nombre }}</div>
-          <div class="brand">{{ p.marca }}</div>
-        </div>
-        <div class="sales">{{ p.ventas }} ventas</div>
-      </div>
-    </div>
-  </section>
-</div>
-
 <section class="card full">
-  <div class="card-title">Todas las Órdenes</div>
-  <div class="orders-head">
-    <div class="col ord">Orden</div>
-    <div class="col cli">Cliente</div>
-    <div class="col prod">Producto</div>
-    <div class="col monto">Monto</div>
-    <div class="col estado">Estado</div>
-    <div class="col fecha">Fecha</div>
-    <div class="col acc">Acciones</div>
+  <div class="card-title">Todas las Ventas</div>
+  
+  <!-- Loading State -->
+  <div *ngIf="cargando" class="loading-state">
+    <p>Cargando ventas...</p>
   </div>
 
-  <div class="orders-row" *ngFor="let o of orders">
-    <div class="col ord">#{{ o.id }}</div>
-    <div class="col cli">{{ o.cliente }}</div>
-    <div class="col prod">{{ o.producto }}</div>
-    <div class="col monto">{{ o.monto }}</div>
-    <div class="col estado">
-      <span class="chip" [class.success]="o.estado==='Completado'" [class.warning]="o.estado==='Pendiente'" [class.info]="o.estado==='Enviado'">{{ o.estado }}</span>
+  <!-- Empty State -->
+  <div *ngIf="!cargando && ventas.length === 0" class="empty-state">
+    <p>No hay ventas registradas</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!cargando && ventas.length > 0">
+    <div class="orders-head">
+      <div class="col ord">Orden</div>
+      <div class="col cli">Cliente</div>
+      <div class="col prod">Productos</div>
+      <div class="col monto">Total</div>
+      <div class="col estado">Estado</div>
+      <div class="col fecha">Fecha</div>
+      <div class="col acc">Acciones</div>
     </div>
-    <div class="col fecha">{{ o.fecha }}</div>
-    <div class="col acc">
-      <button class="icon" title="Ver"><i class="bi bi-eye"></i></button>
+
+    <div class="orders-row" *ngFor="let venta of ventas">
+      <div class="col ord">#{{ venta.numeroVenta || venta.id }}</div>
+      <div class="col cli">{{ obtenerNombreCliente(venta) }}</div>
+      <div class="col prod">{{ obtenerProductosVenta(venta) }}</div>
+      <div class="col monto">${{ (venta.total || 0) | number:'1.0-0' }}</div>
+      <div class="col estado">
+        <span class="chip" 
+              [class.success]="obtenerClaseEstado(venta.estado) === 'success'"
+              [class.warning]="obtenerClaseEstado(venta.estado) === 'warning'"
+              [class.info]="obtenerClaseEstado(venta.estado) === 'info'"
+              [class.danger]="obtenerClaseEstado(venta.estado) === 'danger'">
+          {{ obtenerEstadoBadge(venta.estado) }}
+        </span>
+      </div>
+      <div class="col fecha">{{ formatearFecha(venta.fechaVenta || venta.fechaCreacion) }}</div>
+      <div class="col acc">
+        <button class="icon" title="Ver detalles" (click)="verDetalles(venta)">
+          <i class="bi bi-eye"></i>
+        </button>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- Modal de Detalles de Venta -->
+<div class="modal-overlay" *ngIf="mostrarModal && ventaSeleccionada" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="bi bi-receipt"></i>
+        Detalles de la Venta
+      </h2>
+      <button class="modal-close" (click)="cerrarModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="venta-info-grid">
+        <div class="info-item">
+          <span class="info-label">Número de Venta:</span>
+          <span class="info-value">#{{ ventaSeleccionada.numeroVenta || ventaSeleccionada.id }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Fecha:</span>
+          <span class="info-value">{{ formatearFecha(ventaSeleccionada.fechaVenta || ventaSeleccionada.fechaCreacion) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Cliente:</span>
+          <span class="info-value">{{ obtenerNombreCliente(ventaSeleccionada) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Estado:</span>
+          <span class="info-value">
+            <span class="chip" 
+                  [class.success]="obtenerClaseEstado(ventaSeleccionada.estado) === 'success'"
+                  [class.warning]="obtenerClaseEstado(ventaSeleccionada.estado) === 'warning'"
+                  [class.info]="obtenerClaseEstado(ventaSeleccionada.estado) === 'info'"
+                  [class.danger]="obtenerClaseEstado(ventaSeleccionada.estado) === 'danger'">
+              {{ obtenerEstadoBadge(ventaSeleccionada.estado) }}
+            </span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Método de Pago:</span>
+          <span class="info-value">{{ ventaSeleccionada.metodoPago || 'N/A' }}</span>
+        </div>
+        <div class="info-item" *ngIf="ventaSeleccionada.numeroComprobante">
+          <span class="info-label">Número de Comprobante:</span>
+          <span class="info-value">{{ ventaSeleccionada.numeroComprobante }}</span>
+        </div>
+      </div>
+
+      <div class="productos-section">
+        <h3 class="section-title">
+          <i class="bi bi-box-seam"></i>
+          Productos
+        </h3>
+        <div class="productos-table">
+          <div class="table-header">
+            <div class="col-producto">Producto</div>
+            <div class="col-cantidad">Cantidad</div>
+            <div class="col-precio">Precio Unit.</div>
+            <div class="col-descuento" *ngIf="tieneDescuentos(ventaSeleccionada)">Descuento</div>
+            <div class="col-subtotal">Subtotal</div>
+          </div>
+          <div class="table-body">
+            <div class="table-row" *ngFor="let detalle of ventaSeleccionada?.detallesVenta || []">
+              <div class="col-producto">
+                <div class="product-name">{{ detalle.producto?.nombre || 'Producto desconocido' }}</div>
+                <div class="product-brand" *ngIf="detalle.producto?.marca?.nombre">
+                  {{ detalle.producto?.marca?.nombre }}
+                </div>
+              </div>
+              <div class="col-cantidad">{{ detalle.cantidad }}</div>
+              <div class="col-precio">${{ (detalle.precioUnitario || 0) | number:'1.0-0' }}</div>
+              <div class="col-descuento" *ngIf="tieneDescuentos(ventaSeleccionada)">
+                ${{ (detalle.descuento || 0) | number:'1.0-0' }}
+              </div>
+              <div class="col-subtotal">${{ (detalle.subtotal || 0) | number:'1.0-0' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="totales-section">
+        <div class="total-row">
+          <span class="total-label">Subtotal:</span>
+          <span class="total-value">${{ (ventaSeleccionada.subtotal || 0) | number:'1.0-0' }}</span>
+        </div>
+        <div class="total-row" *ngIf="ventaSeleccionada.descuento && ventaSeleccionada.descuento > 0">
+          <span class="total-label">Descuento:</span>
+          <span class="total-value discount">-${{ (ventaSeleccionada.descuento || 0) | number:'1.0-0' }}</span>
+        </div>
+        <div class="total-row" *ngIf="ventaSeleccionada.impuesto && ventaSeleccionada.impuesto > 0">
+          <span class="total-label">Impuesto:</span>
+          <span class="total-value">${{ (ventaSeleccionada.impuesto || 0) | number:'1.0-0' }}</span>
+        </div>
+        <div class="total-row final">
+          <span class="total-label">TOTAL:</span>
+          <span class="total-value final">${{ (ventaSeleccionada.total || 0) | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="cerrarModal()">
+          <i class="bi bi-x-circle"></i>
+          Cerrar
+        </button>
+        <button class="btn-primary" (click)="descargarPDF()">
+          <i class="bi bi-file-earmark-pdf"></i>
+          Descargar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 

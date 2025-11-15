@@ -1,18 +1,194 @@
-<div class="panel">
-  <div class="panel-title">Gestión de Productos</div>
-  <div class="table">
-    <div class="thead">
-      <div>ID</div>
-      <div>Producto</div>
-      <div>Marca</div>
-      <div>Precio</div>
-      <div>Stock</div>
-      <div>Ventas</div>
-      <div>Estado</div>
-      <div>Acciones</div>
+<div class="productos-container">
+  <div class="productos-header">
+    <div class="header-left">
+      <h1 class="main-title">Gestión de Productos</h1>
+      <p class="subtitle">Administra el inventario de la tienda</p>
     </div>
-    <app-product-item *ngFor="let p of productos" [product]="p"></app-product-item>
+    <div class="header-actions">
+      <button class="btn-add btn-add-category" (click)="abrirFormularioCategoria()">
+        <span class="plus-icon">+</span>
+        Agregar Categoría
+      </button>
+      <button class="btn-add btn-add-brand" (click)="abrirFormularioMarca()">
+        <span class="plus-icon">+</span>
+        Agregar Marca
+      </button>
+      <button class="btn-add btn-add-product" (click)="abrirFormulario()">
+        <span class="plus-icon">+</span>
+        Agregar Producto
+      </button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="productos-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Producto</th>
+          <th>Marca</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Ventas</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos">
+          <td class="id-cell">#{{ producto.id }}</td>
+          <td class="name-cell">{{ producto.nombre }}</td>
+          <td class="brand-cell">{{ obtenerNombreMarcaDesdeProducto(producto) }}</td>
+          <td class="price-cell">${{ formatearPrecio(producto.precioVenta) }}</td>
+          <td class="stock-cell">{{ producto.stock || 0 }}</td>
+          <td class="sales-cell">{{ producto.ventas || 0 }}</td>
+          <td class="status-cell">
+            <span class="badge" [class.badge-active]="producto.estado === 'Activo'" [class.badge-soldout]="producto.estado === 'Agotado'">
+              {{ producto.estado }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view-btn" (click)="verProducto(producto)" title="Ver">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button class="action-btn edit-btn" (click)="abrirFormulario(producto)" title="Editar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="action-btn delete-btn" (click)="eliminarProducto(producto)" title="Eliminar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="productos.length === 0">
+          <td colspan="8" class="empty-state">
+            <p>No hay productos registrados</p>
+            <button class="btn-add-first" (click)="abrirFormulario()">Agregar primer producto</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal de formulario -->
+  <div class="modal-overlay" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editando ? 'Editar Producto' : 'Agregar Producto' }}</h2>
+        <button class="close-btn" (click)="cerrarFormulario()">×</button>
+      </div>
+      <form class="product-form" (ngSubmit)="guardarProducto()">
+        <div class="form-group">
+          <label for="nombre">Nombre del Producto *</label>
+          <input type="text" id="nombre" [(ngModel)]="productoForm.nombre" name="nombre" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="categoria">Categoría *</label>
+            <select id="categoria" [(ngModel)]="productoForm.categoriaId" name="categoriaId" required>
+              <option value="">Seleccione una categoría</option>
+              <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="marca">Marca *</label>
+            <select id="marca" [(ngModel)]="productoForm.marcaId" name="marcaId" required>
+              <option value="">Seleccione una marca</option>
+              <option *ngFor="let marca of marcas" [value]="marca.id">{{ marca.nombre }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="precioVenta">Precio de Venta *</label>
+            <input type="number" id="precioVenta" [(ngModel)]="productoForm.precioVenta" name="precioVenta" min="0" step="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <label for="precioCompra">Precio de Compra</label>
+            <input type="number" id="precioCompra" [(ngModel)]="productoForm.precioCompra" name="precioCompra" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="imagenPrincipal">URL de Imagen</label>
+          <input type="url" id="imagenPrincipal" [(ngModel)]="productoForm.imagenPrincipal" name="imagenPrincipal" placeholder="https://ejemplo.com/imagen.jpg">
+          <small class="form-hint">Ingresa la URL de la imagen del producto</small>
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" [(ngModel)]="productoForm.descripcion" name="descripcion" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
+          <button type="submit" class="btn-save">{{ editando ? 'Actualizar' : 'Guardar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de formulario de categoría -->
+  <div class="modal-overlay" *ngIf="mostrarFormularioCategoria" (click)="cerrarFormularioCategoria()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Agregar Categoría</h2>
+        <button class="close-btn" (click)="cerrarFormularioCategoria()">×</button>
+      </div>
+      <form class="product-form" (ngSubmit)="guardarCategoria()">
+        <div class="form-group">
+          <label for="categoriaNombre">Nombre de la Categoría *</label>
+          <input type="text" id="categoriaNombre" [(ngModel)]="categoriaForm.nombre" name="categoriaNombre" required>
+        </div>
+
+        <div class="form-group">
+          <label for="categoriaDescripcion">Descripción</label>
+          <textarea id="categoriaDescripcion" [(ngModel)]="categoriaForm.descripcion" name="categoriaDescripcion" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarFormularioCategoria()">Cancelar</button>
+          <button type="submit" class="btn-save">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de formulario de marca -->
+  <div class="modal-overlay" *ngIf="mostrarFormularioMarca" (click)="cerrarFormularioMarca()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Agregar Marca</h2>
+        <button class="close-btn" (click)="cerrarFormularioMarca()">×</button>
+      </div>
+      <form class="product-form" (ngSubmit)="guardarMarca()">
+        <div class="form-group">
+          <label for="marcaNombre">Nombre de la Marca *</label>
+          <input type="text" id="marcaNombre" [(ngModel)]="marcaForm.nombre" name="marcaNombre" required>
+        </div>
+
+        <div class="form-group">
+          <label for="marcaDescripcion">Descripción</label>
+          <textarea id="marcaDescripcion" [(ngModel)]="marcaForm.descripcion" name="marcaDescripcion" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="cerrarFormularioMarca()">Cancelar</button>
+          <button type="submit" class="btn-save">Guardar</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-
-

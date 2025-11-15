@@ -2,10 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login';
 import { ProfileComponent } from './components/profile/profile';
 import { HomeComponent } from './components/home/home';
-import { MenComponent } from './components/men/men';
-import { WomenComponent } from './components/women/women';
-import { KidsComponent } from './components/kids/kids';
-import { OffersComponent } from './components/offers/offers';
+import { CatalogoComponent } from './components/catalogo/catalogo';
 import { AdminComponent } from './components/admin/admin';
 import { AdminDashboardComponent } from './components/admin/dashboard/admin-dashboard';
 import { AdminProductosComponent } from './components/admin/sections/admin-productos';
@@ -16,10 +13,7 @@ import { AdminUsuariosComponent } from './components/admin/sections/admin-usuari
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'hombres', component: MenComponent },
-  { path: 'mujeres', component: WomenComponent },
-  { path: 'ninos', component: KidsComponent },
-  { path: 'ofertas', component: OffersComponent },
+  { path: 'catalogo', component: CatalogoComponent },
   { path: 'admin', component: AdminComponent, children: [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     { path: 'dashboard', component: AdminDashboardComponent },

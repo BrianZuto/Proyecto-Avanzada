@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Usuario } from '../models/usuario';
 import { environment } from '../../environments/environment';
 
@@ -16,7 +17,9 @@ export class UsuarioService {
    * Obtiene todos los usuarios
    */
   obtenerUsuarios(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.apiUrl);
+    return this.http.get<{ success: boolean; data: Usuario[]; total: number }>(this.apiUrl).pipe(
+      map(response => response.data || [])
+    );
   }
 
   /**
@@ -34,17 +37,24 @@ export class UsuarioService {
   }
 
   /**
+   * Verifica si un email está disponible
+   */
+  verificarEmail(email: string): Observable<{ disponible: boolean }> {
+    return this.http.get<{ disponible: boolean }>(`${this.apiUrl}/check-email?email=${email}`);
+  }
+
+  /**
    * Actualiza un usuario existente
    */
-  actualizarUsuario(id: number, usuario: Usuario): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, usuario);
+  actualizarUsuario(id: number, usuario: Usuario): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, usuario);
   }
 
   /**
    * Elimina un usuario
    */
-  eliminarUsuario(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  eliminarUsuario(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 
   /**

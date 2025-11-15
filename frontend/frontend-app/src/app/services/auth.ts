@@ -51,10 +51,11 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string): Observable<boolean> {
+  login(email: string, password: string): Observable<{ success: boolean; message?: string }> {
     return new Observable(observer => {
       this.http.post<any>(`${this.apiUrl}/login`, { email, password }).subscribe({
         next: (response) => {
+          console.log('Login response:', response);
           if (response.success) {
             const user: User = {
               id: response.user.id,
@@ -67,27 +68,61 @@ export class AuthService {
             localStorage.setItem('currentUser', JSON.stringify(user));
             if (response.token) {
               localStorage.setItem('authToken', response.token);
-            // TEST LOG
-            this.logTokenStatus(response.token, 'LOGIN');
+              // TEST LOG
+              this.logTokenStatus(response.token, 'LOGIN');
             }
-            observer.next(true);
+            observer.next({ success: true });
           } else {
-            observer.next(false);
+            const errorMessage = response.message || 'Credenciales incorrectas';
+            console.error('Login failed:', errorMessage);
+            observer.next({ success: false, message: errorMessage });
           }
           observer.complete();
         },
-        error: () => {
-          observer.next(false);
+        error: (error) => {
+          console.error('Login error:', error);
+          let errorMessage = 'Error al iniciar sesión';
+          
+          // Manejar error de conexión (status: 0)
+          if (error.status === 0) {
+            errorMessage = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en http://localhost:8080';
+            console.error('ERROR DE CONEXIÓN: El backend no está accesible');
+            console.error('Verifica que:');
+            console.error('1. El backend esté corriendo');
+            console.error('2. El backend esté en el puerto 8080');
+            console.error('3. No haya firewall bloqueando la conexión');
+          } else if (error.error) {
+            // Intentar extraer el mensaje de error del backend
+            if (error.error.message) {
+              errorMessage = error.error.message;
+            } else if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            }
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          // Log detallado para debugging
+          console.error('Error details:', {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            error: error.error,
+            message: errorMessage
+          });
+          
+          observer.next({ success: false, message: errorMessage });
           observer.complete();
         }
       });
     });
   }
 
-  register(nombre: string, email: string, password: string): Observable<boolean> {
+  register(nombre: string, email: string, password: string): Observable<{ success: boolean; message?: string }> {
     return new Observable(observer => {
       this.http.post<any>(`${this.apiUrl}/register`, { nombre, email, password }).subscribe({
         next: (response) => {
+          console.log('Register response:', response);
           if (response.success) {
             const user: User = {
               id: response.user.id,
@@ -100,17 +135,50 @@ export class AuthService {
             localStorage.setItem('currentUser', JSON.stringify(user));
             if (response.token) {
               localStorage.setItem('authToken', response.token);
-            // TEST LOG
-            this.logTokenStatus(response.token, 'REGISTER');
+              // TEST LOG
+              this.logTokenStatus(response.token, 'REGISTER');
             }
-            observer.next(true);
+            observer.next({ success: true });
           } else {
-            observer.next(false);
+            const errorMessage = response.message || 'Error al registrar usuario';
+            console.error('Register failed:', errorMessage);
+            observer.next({ success: false, message: errorMessage });
           }
           observer.complete();
         },
-        error: () => {
-          observer.next(false);
+        error: (error) => {
+          console.error('Register error:', error);
+          let errorMessage = 'Error al registrar usuario';
+          
+          // Manejar error de conexión (status: 0)
+          if (error.status === 0) {
+            errorMessage = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en http://localhost:8080';
+            console.error('ERROR DE CONEXIÓN: El backend no está accesible');
+            console.error('Verifica que:');
+            console.error('1. El backend esté corriendo');
+            console.error('2. El backend esté en el puerto 8080');
+            console.error('3. No haya firewall bloqueando la conexión');
+          } else if (error.error) {
+            // Intentar extraer el mensaje de error del backend
+            if (error.error.message) {
+              errorMessage = error.error.message;
+            } else if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            }
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          // Log detallado para debugging
+          console.error('Error details:', {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            error: error.error,
+            message: errorMessage
+          });
+          
+          observer.next({ success: false, message: errorMessage });
           observer.complete();
         }
       });
