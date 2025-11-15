@@ -65,6 +65,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/compras/**").authenticated()
                 .requestMatchers("/api/ventas/**").authenticated()
                 .requestMatchers("/api/reportes/**").authenticated()
+                .requestMatchers("/api/direcciones/**").authenticated()
+                .requestMatchers("/api/metodos-pago/**").authenticated()
                 
                 // Permitir acceso a recursos estáticos
                 .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll()

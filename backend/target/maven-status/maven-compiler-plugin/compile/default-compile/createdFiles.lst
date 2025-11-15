@@ -1,4 +1,5 @@
 com\proyectoavanzada\backend\controller\AuthController$PasswordHashRequest.class
+com\proyectoavanzada\backend\model\Direccion.class
 com\proyectoavanzada\backend\service\UsuarioService.class
 com\proyectoavanzada\backend\service\VentaService.class
 com\proyectoavanzada\backend\exception\ConflictException.class
@@ -12,12 +13,15 @@ com\proyectoavanzada\backend\model\Producto.class
 com\proyectoavanzada\backend\service\ClienteService.class
 com\proyectoavanzada\backend\controller\AuthController$RegisterRequest.class
 com\proyectoavanzada\backend\controller\TestController.class
+com\proyectoavanzada\backend\service\DireccionService.class
 com\proyectoavanzada\backend\model\DetalleVenta.class
+com\proyectoavanzada\backend\security\CustomUserDetailsService.class
 com\proyectoavanzada\backend\service\MarcaService.class
 com\proyectoavanzada\backend\repository\ReporteRepository.class
 com\proyectoavanzada\backend\BackendApplication.class
 com\proyectoavanzada\backend\config\SecurityConfig.class
 com\proyectoavanzada\backend\controller\AuthController$EmailCheckRequest.class
+com\proyectoavanzada\backend\controller\DireccionController$DireccionRequest.class
 com\proyectoavanzada\backend\repository\PresentacionRepository.class
 com\proyectoavanzada\backend\model\Compra.class
 com\proyectoavanzada\backend\controller\VentaController.class
@@ -27,6 +31,7 @@ com\proyectoavanzada\backend\controller\AuthController$UpdateProfileRequest.clas
 com\proyectoavanzada\backend\service\ProductoService.class
 com\proyectoavanzada\backend\exception\AccessDeniedException.class
 com\proyectoavanzada\backend\repository\ProductoRepository.class
+com\proyectoavanzada\backend\security\JwtAuthenticationFilter.class
 com\proyectoavanzada\backend\service\ReporteService.class
 com\proyectoavanzada\backend\repository\CategoriaRepository.class
 com\proyectoavanzada\backend\repository\VentaRepository.class
@@ -37,6 +42,8 @@ com\proyectoavanzada\backend\model\Usuario.class
 com\proyectoavanzada\backend\controller\AuthController.class
 com\proyectoavanzada\backend\model\Venta.class
 com\proyectoavanzada\backend\model\Proveedor.class
+com\proyectoavanzada\backend\security\JwtService.class
+com\proyectoavanzada\backend\repository\DireccionRepository.class
 com\proyectoavanzada\backend\model\DetalleCompra.class
 com\proyectoavanzada\backend\service\CompraService.class
 com\proyectoavanzada\backend\controller\UsuarioController.class
@@ -50,8 +57,10 @@ com\proyectoavanzada\backend\repository\DetalleVentaRepository.class
 com\proyectoavanzada\backend\model\Presentacion.class
 com\proyectoavanzada\backend\controller\ClienteController.class
 com\proyectoavanzada\backend\model\Cliente.class
+com\proyectoavanzada\backend\config\OpenApiConfig.class
 com\proyectoavanzada\backend\config\CorsConfig.class
 com\proyectoavanzada\backend\controller\CategoriaController.class
+com\proyectoavanzada\backend\controller\DireccionController.class
 com\proyectoavanzada\backend\model\Categoria.class
 com\proyectoavanzada\backend\controller\AuthController$LoginRequest.class
 com\proyectoavanzada\backend\model\Reporte.class

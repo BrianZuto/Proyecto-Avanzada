@@ -1,7 +1,7 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -22,11 +22,10 @@ public class Proveedor {
     private String nombre;
     
     @NotBlank(message = "El RUC es obligatorio")
-    @Size(min = 11, max = 11, message = "El RUC debe tener 11 dígitos")
+    @Size(min = 8, max = 20, message = "El RUC debe tener entre 8 y 20 caracteres")
     @Column(name = "ruc", nullable = false, unique = true)
     private String ruc;
     
-    @Email(message = "El email debe tener un formato válido")
     @Column(name = "email")
     private String email;
     
@@ -65,6 +64,7 @@ public class Proveedor {
     
     // Relación con compras
     @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Compra> compras;
     
     // Constructores

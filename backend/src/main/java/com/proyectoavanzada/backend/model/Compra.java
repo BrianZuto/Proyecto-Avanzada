@@ -1,5 +1,6 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -20,12 +21,12 @@ public class Compra {
     private String numeroFactura;
     
     @NotNull(message = "El proveedor es obligatorio")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "proveedor_id", nullable = false)
     private Proveedor proveedor;
     
     @NotNull(message = "El usuario es obligatorio")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
     
@@ -72,6 +73,7 @@ public class Compra {
     
     // Relaciones
     @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "compra"})
     private List<DetalleCompra> detallesCompra;
     
     // Constructores
@@ -118,6 +120,15 @@ public class Compra {
     
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+    
+    // Getters para obtener IDs sin serializar objetos completos
+    public Long getProveedorId() {
+        return proveedor != null ? proveedor.getId() : null;
+    }
+    
+    public Long getUsuarioId() {
+        return usuario != null ? usuario.getId() : null;
     }
     
     public LocalDateTime getFechaCompra() {

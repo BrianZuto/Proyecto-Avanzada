@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +38,9 @@ public class ProductoController {
     
     @Autowired
     private MarcaService marcaService;
+    
+    @Autowired
+    private com.proyectoavanzada.backend.service.InventarioService inventarioService;
     
     /**
      * Obtener todos los productos
@@ -69,9 +70,59 @@ public class ProductoController {
         Map<String, Object> response = new HashMap<>();
         try {
             List<Producto> productos = productoService.obtenerTodosLosProductos();
+            
+            // Agregar stock calculado desde inventario a cada producto
+            List<Map<String, Object>> productosConStock = productos.stream().map(producto -> {
+                Map<String, Object> productoMap = new HashMap<>();
+                productoMap.put("id", producto.getId());
+                productoMap.put("nombre", producto.getNombre());
+                productoMap.put("descripcion", producto.getDescripcion());
+                productoMap.put("codigoProducto", producto.getCodigoProducto());
+                productoMap.put("categoriaId", producto.getCategoriaId());
+                productoMap.put("marcaId", producto.getMarcaId());
+                productoMap.put("precioVenta", producto.getPrecioVenta());
+                productoMap.put("precioCompra", producto.getPrecioCompra());
+                productoMap.put("imagenPrincipal", producto.getImagenPrincipal());
+                productoMap.put("imagenesAdicionales", producto.getImagenesAdicionales());
+                productoMap.put("genero", producto.getGenero());
+                productoMap.put("edadTarget", producto.getEdadTarget());
+                productoMap.put("materialPrincipal", producto.getMaterialPrincipal());
+                productoMap.put("tipoSuela", producto.getTipoSuela());
+                productoMap.put("tecnologia", producto.getTecnologia());
+                productoMap.put("pesoGramos", producto.getPesoGramos());
+                productoMap.put("garantiaMeses", producto.getGarantiaMeses());
+                productoMap.put("stockMinimo", producto.getStockMinimo());
+                productoMap.put("esDestacado", producto.getEsDestacado());
+                productoMap.put("esNuevo", producto.getEsNuevo());
+                productoMap.put("descuentoPorcentaje", producto.getDescuentoPorcentaje());
+                productoMap.put("activo", producto.getActivo());
+                productoMap.put("fechaCreacion", producto.getFechaCreacion());
+                productoMap.put("fechaActualizacion", producto.getFechaActualizacion());
+                
+                // Calcular stock desde inventario
+                Integer stock = inventarioService.obtenerStockProducto(producto.getId());
+                productoMap.put("stock", stock);
+                
+                // Agregar información de categoría y marca si están disponibles
+                if (producto.getCategoria() != null) {
+                    Map<String, Object> categoriaMap = new HashMap<>();
+                    categoriaMap.put("id", producto.getCategoria().getId());
+                    categoriaMap.put("nombre", producto.getCategoria().getNombre());
+                    productoMap.put("categoria", categoriaMap);
+                }
+                if (producto.getMarca() != null) {
+                    Map<String, Object> marcaMap = new HashMap<>();
+                    marcaMap.put("id", producto.getMarca().getId());
+                    marcaMap.put("nombre", producto.getMarca().getNombre());
+                    productoMap.put("marca", marcaMap);
+                }
+                
+                return productoMap;
+            }).collect(java.util.stream.Collectors.toList());
+            
             response.put("success", true);
-            response.put("data", productos);
-            response.put("total", productos.size());
+            response.put("data", productosConStock);
+            response.put("total", productosConStock.size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);

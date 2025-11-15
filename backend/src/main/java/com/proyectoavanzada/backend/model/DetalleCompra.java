@@ -1,5 +1,6 @@
 package com.proyectoavanzada.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -17,16 +18,16 @@ public class DetalleCompra {
     @NotNull(message = "La compra es obligatoria")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "compra_id", nullable = false)
+    @JsonIgnore
     private Compra compra;
     
     @NotNull(message = "El producto es obligatorio")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
     
-    @NotNull(message = "La presentación es obligatoria")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "presentacion_id", nullable = false)
+    @JoinColumn(name = "presentacion_id", nullable = true)
     private Presentacion presentacion;
     
     @Positive(message = "La cantidad debe ser mayor a 0")
@@ -130,6 +131,19 @@ public class DetalleCompra {
     
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+    
+    // Getters para obtener IDs sin serializar objetos completos
+    public Long getCompraId() {
+        return compra != null ? compra.getId() : null;
+    }
+    
+    public Long getProductoId() {
+        return producto != null ? producto.getId() : null;
+    }
+    
+    public Long getPresentacionId() {
+        return presentacion != null ? presentacion.getId() : null;
     }
     
     // Métodos de negocio

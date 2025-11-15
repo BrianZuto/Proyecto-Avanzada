@@ -259,9 +259,10 @@ public class VentaController {
      * Crear nueva venta
      */
     @PostMapping
-    public ResponseEntity<Map<String, Object>> crearVenta(@Valid @RequestBody Venta venta) {
+    public ResponseEntity<Map<String, Object>> crearVenta(@RequestBody Venta venta) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // El servicio se encargará de validar y cargar los objetos necesarios
             Venta ventaGuardada = ventaService.crearVenta(venta);
             response.put("success", true);
             response.put("message", "Venta creada exitosamente");
