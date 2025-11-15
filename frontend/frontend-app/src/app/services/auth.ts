@@ -26,7 +26,12 @@ export class AuthService {
     const savedUser = localStorage.getItem('currentUser');
     const token = localStorage.getItem('authToken');
     if (savedUser && token) {
-      this.currentUserSubject.next(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      // Normalizar el rol al cargar desde localStorage
+      if (parsedUser.rol) {
+        parsedUser.rol = this.normalizeRole(parsedUser.rol);
+      }
+      this.currentUserSubject.next(parsedUser);
       // TEST LOG: Mostrar estado del token al iniciar la app
       this.logTokenStatus(token, 'INIT');
     }
@@ -57,12 +62,14 @@ export class AuthService {
         next: (response) => {
           console.log('Login response:', response);
           if (response.success) {
+            // Normalizar el rol del backend al formato del frontend
+            const rolNormalizado = this.normalizeRole(response.user.rol);
             const user: User = {
               id: response.user.id,
               nombre: response.user.nombre,
               email: response.user.email,
               activo: response.user.activo,
-              rol: response.user.rol
+              rol: rolNormalizado
             };
             this.currentUserSubject.next(user);
             localStorage.setItem('currentUser', JSON.stringify(user));
@@ -82,7 +89,7 @@ export class AuthService {
         error: (error) => {
           console.error('Login error:', error);
           let errorMessage = 'Error al iniciar sesión';
-          
+
           // Manejar error de conexión (status: 0)
           if (error.status === 0) {
             errorMessage = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en http://localhost:8080';
@@ -101,7 +108,7 @@ export class AuthService {
           } else if (error.message) {
             errorMessage = error.message;
           }
-          
+
           // Log detallado para debugging
           console.error('Error details:', {
             status: error.status,
@@ -110,7 +117,7 @@ export class AuthService {
             error: error.error,
             message: errorMessage
           });
-          
+
           observer.next({ success: false, message: errorMessage });
           observer.complete();
         }
@@ -124,12 +131,14 @@ export class AuthService {
         next: (response) => {
           console.log('Register response:', response);
           if (response.success) {
+            // Normalizar el rol del backend al formato del frontend
+            const rolNormalizado = this.normalizeRole(response.user.rol);
             const user: User = {
               id: response.user.id,
               nombre: response.user.nombre,
               email: response.user.email,
               activo: response.user.activo,
-              rol: response.user.rol
+              rol: rolNormalizado
             };
             this.currentUserSubject.next(user);
             localStorage.setItem('currentUser', JSON.stringify(user));
@@ -149,7 +158,7 @@ export class AuthService {
         error: (error) => {
           console.error('Register error:', error);
           let errorMessage = 'Error al registrar usuario';
-          
+
           // Manejar error de conexión (status: 0)
           if (error.status === 0) {
             errorMessage = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en http://localhost:8080';
@@ -168,7 +177,7 @@ export class AuthService {
           } else if (error.message) {
             errorMessage = error.message;
           }
-          
+
           // Log detallado para debugging
           console.error('Error details:', {
             status: error.status,
@@ -177,7 +186,7 @@ export class AuthService {
             error: error.error,
             message: errorMessage
           });
-          
+
           observer.next({ success: false, message: errorMessage });
           observer.complete();
         }
@@ -199,17 +208,41 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  /**
+   * Normaliza el rol del backend al formato esperado por el frontend
+   */
+  private normalizeRole(rol: string | undefined): 'Admin' | 'Empleado' | 'Usuario' {
+    if (!rol) return 'Usuario';
+    const rolLower = rol.toLowerCase().trim();
+    // Mapear variantes del backend al formato del frontend
+    if (rolLower === 'admin' || rolLower === 'administrador') {
+      return 'Admin';
+    }
+    if (rolLower === 'empleado' || rolLower === 'vendedor' || rolLower === 'gerente') {
+      return 'Empleado';
+    }
+    return 'Usuario';
+  }
+
   hasRole(role: 'Admin' | 'Empleado' | 'Usuario'): boolean {
     const user = this.getCurrentUser();
-    return user ? user.rol === role : false;
+    if (!user) return false;
+    const normalizedRole = this.normalizeRole(user.rol);
+    return normalizedRole === role;
   }
 
   isAdmin(): boolean {
-    return this.hasRole('Admin');
+    const user = this.getCurrentUser();
+    if (!user) return false;
+    const normalizedRole = this.normalizeRole(user.rol);
+    return normalizedRole === 'Admin';
   }
 
   isEmpleado(): boolean {
-    return this.hasRole('Empleado');
+    const user = this.getCurrentUser();
+    if (!user) return false;
+    const normalizedRole = this.normalizeRole(user.rol);
+    return normalizedRole === 'Empleado';
   }
 
   isUsuario(): boolean {
@@ -236,6 +269,8 @@ export class AuthService {
       this.http.get<any>(`${this.apiUrl}/profile/${userId}`).subscribe({
         next: (response) => {
           if (response.success) {
+            // Normalizar el rol del backend al formato del frontend
+            const rolNormalizado = this.normalizeRole(response.user.rol);
             const user: User = {
               id: response.user.id,
               nombre: response.user.nombre,
@@ -243,7 +278,7 @@ export class AuthService {
               telefono: response.user.telefono,
               fechaNacimiento: response.user.fechaNacimiento,
               activo: response.user.activo,
-              rol: response.user.rol
+              rol: rolNormalizado
             };
             observer.next(user);
           } else {
