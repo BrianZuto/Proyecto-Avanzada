@@ -1,0 +1,70 @@
+<app-main-layout>
+  <!-- Catálogo Section -->
+  <section class="catalogo-section">
+    <div class="catalogo-container">
+      <div class="section-header">
+        <h1 class="section-title">Catálogo de Productos</h1>
+        <p class="section-subtitle">Encuentra los sneakers perfectos para tu estilo</p>
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="category-tabs" *ngIf="!cargando">
+        <button class="tab" [class.active]="categoriaActiva === 'Todos'" (click)="cambiarCategoria('Todos')">Todos</button>
+        <button class="tab" *ngFor="let marca of obtenerMarcasUnicas()" 
+                [class.active]="categoriaActiva === marca" 
+                (click)="cambiarCategoria(marca)">
+          {{ marca }}
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="cargando" class="loading-container">
+        <p>Cargando productos...</p>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="!cargando">
+        <div class="product-card" *ngFor="let producto of productosFiltrados">
+          <div class="product-badge" 
+               *ngIf="obtenerBadge(producto)" 
+               [class.discount]="obtenerBadge(producto) === 'discount'" 
+               [class.new]="obtenerBadge(producto) === 'new'">
+            <span *ngIf="obtenerBadge(producto) === 'discount'">
+              -{{ producto.descuentoPorcentaje }}%
+            </span>
+            <span *ngIf="obtenerBadge(producto) === 'new'">Nuevo</span>
+          </div>
+          <div class="product-image">
+            <img [src]="obtenerImagenProducto(producto)" [alt]="producto.nombre">
+          </div>
+          <div class="product-info">
+            <div class="product-brand">{{ producto.marca?.nombre || 'Sin marca' }}</div>
+            <div class="product-model">{{ producto.nombre }}</div>
+            <div class="product-price">
+              <span class="current-price">${{ obtenerPrecioConDescuento(producto) | number:'1.0-0' }}</span>
+              <span class="original-price" *ngIf="producto.descuentoPorcentaje && producto.descuentoPorcentaje > 0">
+                ${{ producto.precioVenta | number:'1.0-0' }}
+              </span>
+            </div>
+            <div class="product-stock" *ngIf="producto.stock !== undefined">
+              <span [class.stock-available]="producto.stock > 0" [class.stock-out]="producto.stock === 0">
+                {{ producto.stock > 0 ? 'En stock: ' + producto.stock : 'Agotado' }}
+              </span>
+            </div>
+            <button class="product-btn" 
+                    (click)="agregarAlCarrito(producto)"
+                    [disabled]="!producto.stock || producto.stock === 0">
+              {{ producto.stock && producto.stock > 0 ? 'Agregar al carrito' : 'Agotado' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!cargando && productosFiltrados.length === 0" class="empty-state">
+        <p>No se encontraron productos.</p>
+      </div>
+    </div>
+  </section>
+</app-main-layout>
+

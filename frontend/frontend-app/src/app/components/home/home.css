@@ -28,6 +28,47 @@ app-root {
   padding: 0;
 }
 
+/* Loading and Empty States */
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 18px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+.product-stock {
+  margin: 0.4rem 0;
+  font-size: 0.75rem;
+}
+
+.stock-available {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.stock-out {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.product-description {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0.4rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Asegurar que no haya bordes blancos */
 * {
   box-sizing: border-box;
@@ -273,31 +314,31 @@ html, body, div, span, app-root, header, section, footer {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
 .product-card {
   background: white;
-  border-radius: 20px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   position: relative;
 }
 
 .product-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .product-badge {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 15px;
+  font-size: 0.7rem;
   font-weight: 600;
   z-index: 10;
 }
@@ -315,7 +356,7 @@ html, body, div, span, app-root, header, section, footer {
 .product-image {
   position: relative;
   overflow: hidden;
-  height: 250px;
+  height: 180px;
 }
 
 .product-image img {
@@ -330,24 +371,24 @@ html, body, div, span, app-root, header, section, footer {
 }
 
 .product-info {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .product-brand {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: #6c757d;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .product-model {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #1a1a2e;
-  margin-bottom: 0.8rem;
-  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .product-rating {
@@ -370,18 +411,18 @@ html, body, div, span, app-root, header, section, footer {
 .product-price {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .current-price {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #1a1a2e;
 }
 
 .original-price {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: #6c757d;
   text-decoration: line-through;
 }
@@ -443,12 +484,13 @@ html, body, div, span, app-root, header, section, footer {
 
 .product-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 0.7rem;
   background: linear-gradient(45deg, #0b1324, #1e3a8a);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }

@@ -5,4 +5,7 @@ export interface Usuario {
   password?: string;
   fechaCreacion?: string;
   activo?: boolean;
+  rol?: string; // Admin, Empleado, Usuario
+  fechaNacimiento?: string;
+  telefono?: string;
 }

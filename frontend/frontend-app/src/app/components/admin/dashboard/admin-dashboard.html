@@ -1,46 +1,69 @@
 <div class="metrics">
   <div class="card">
     <div class="label">Ventas Totales</div>
-    <div class="value">${{ metrics.ventas | number:'1.0-0' }}</div>
-    <div class="hint">+12.5% desde el mes pasado</div>
+    <div class="value" *ngIf="!cargando">${{ metrics.ventas | number:'1.0-0' }}</div>
+    <div class="value" *ngIf="cargando">Cargando...</div>
+    <div class="hint">Total acumulado</div>
   </div>
   <div class="card">
     <div class="label">Órdenes</div>
-    <div class="value">{{ metrics.ordenes }}</div>
-    <div class="hint">+8.2% esta semana</div>
+    <div class="value" *ngIf="!cargando">{{ metrics.ordenes }}</div>
+    <div class="value" *ngIf="cargando">Cargando...</div>
+    <div class="hint">Ventas completadas</div>
   </div>
   <div class="card">
     <div class="label">Productos</div>
-    <div class="value">{{ metrics.productos }}</div>
-    <div class="hint">5 nuevos</div>
+    <div class="value" *ngIf="!cargando">{{ metrics.productos }}</div>
+    <div class="value" *ngIf="cargando">Cargando...</div>
+    <div class="hint">Productos activos</div>
   </div>
   <div class="card">
     <div class="label">Usuarios</div>
-    <div class="value">{{ metrics.usuarios }}</div>
-    <div class="hint">+15 esta semana</div>
+    <div class="value" *ngIf="!cargando">{{ metrics.usuarios }}</div>
+    <div class="value" *ngIf="cargando">Cargando...</div>
+    <div class="hint">Usuarios activos</div>
   </div>
 </div>
 
 <div class="panel">
   <div class="panel-title">Órdenes Recientes</div>
   <div class="table">
-    <div class="thead">
-      <div>Orden</div>
-      <div>Cliente</div>
-      <div>Producto</div>
-      <div>Monto</div>
-      <div>Estado</div>
-      <div>Fecha</div>
+    <!-- Loading State -->
+    <div *ngIf="cargando" class="loading-state">
+      <p>Cargando órdenes...</p>
     </div>
-    <div class="row" *ngFor="let o of ordenes">
-      <div>{{ o.id }}</div>
-      <div>{{ o.cliente }}</div>
-      <div>{{ o.producto }}</div>
-      <div>${{ o.monto | number:'1.0-0' }}</div>
-      <div>
-        <span class="badge" [class.ok]="o.estado==='Completado'" [class.warn]="o.estado==='Pendiente'" [class.info]="o.estado==='Enviado'">{{ o.estado }}</span>
+    
+    <!-- Empty State -->
+    <div *ngIf="!cargando && ordenes.length === 0" class="empty-state">
+      <p>No hay órdenes recientes</p>
+    </div>
+    
+    <!-- Table Content -->
+    <div *ngIf="!cargando && ordenes.length > 0">
+      <div class="thead">
+        <div>Orden</div>
+        <div>Cliente</div>
+        <div>Producto</div>
+        <div>Monto</div>
+        <div>Estado</div>
+        <div>Fecha</div>
       </div>
-      <div>{{ o.fecha }}</div>
+      <div class="row" *ngFor="let o of ordenes">
+        <div>{{ o.id }}</div>
+        <div>{{ o.cliente }}</div>
+        <div>{{ o.producto }}</div>
+        <div>${{ o.monto | number:'1.0-0' }}</div>
+        <div>
+          <span class="badge" 
+                [class.ok]="obtenerClaseEstado(o.estado) === 'ok'"
+                [class.warn]="obtenerClaseEstado(o.estado) === 'warn'"
+                [class.info]="obtenerClaseEstado(o.estado) === 'info'"
+                [class.danger]="obtenerClaseEstado(o.estado) === 'danger'">
+            {{ o.estado }}
+          </span>
+        </div>
+        <div>{{ o.fecha }}</div>
+      </div>
     </div>
   </div>
 </div>

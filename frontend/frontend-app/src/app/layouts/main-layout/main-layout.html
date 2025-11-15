@@ -9,10 +9,7 @@
     <!-- Navigation -->
     <nav class="nav">
       <a routerLink="/" class="nav-link">Inicio</a>
-      <a routerLink="/hombres" class="nav-link">Hombres</a>
-      <a routerLink="/mujeres" class="nav-link">Mujeres</a>
-      <a routerLink="/ninos" class="nav-link">Niños</a>
-      <a routerLink="/ofertas" class="nav-link">Ofertas</a>
+      <a routerLink="/catalogo" class="nav-link">Catálogo</a>
       <a routerLink="/admin" class="nav-link" *ngIf="isAdmin() || isEmpleado()">Admin</a>
     </nav>
 
@@ -44,7 +41,10 @@
             </div>
           </div>
         </div>
-        <i class="bi bi-cart3 icon icon-white"></i>
+        <div class="cart-icon-wrapper" (click)="toggleCarritoModal()">
+          <i class="bi bi-cart3 icon icon-white"></i>
+          <span class="cart-badge" *ngIf="cantidadCarrito > 0">{{ cantidadCarrito }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -53,6 +53,90 @@
 <!-- Content Area -->
 <div class="content-wrapper">
   <ng-content></ng-content>
+</div>
+
+<!-- Carrito Modal -->
+<div class="modal-overlay" *ngIf="showCarritoModal" (click)="toggleCarritoModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Mi Carrito</h2>
+      <button class="close-btn" (click)="toggleCarritoModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Lista de productos -->
+      <div class="carrito-items" *ngIf="carritoItems.length > 0">
+        <div class="carrito-item" *ngFor="let item of carritoItems">
+          <div class="item-image">
+            <img [src]="item.producto.imagenPrincipal || 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=100&h=100&fit=crop'" 
+                 [alt]="item.producto.nombre">
+          </div>
+          <div class="item-info">
+            <div class="item-name">{{ item.producto.nombre }}</div>
+            <div class="item-brand">{{ item.producto.marca?.nombre }}</div>
+            <div class="item-price">${{ item.precioUnitario | number:'1.0-0' }} c/u</div>
+          </div>
+          <div class="item-actions">
+            <div class="quantity-controls">
+              <button class="qty-btn" (click)="actualizarCantidad(item.producto.id, item.cantidad - 1)">-</button>
+              <span class="qty-value">{{ item.cantidad }}</span>
+              <button class="qty-btn" (click)="actualizarCantidad(item.producto.id, item.cantidad + 1)">+</button>
+            </div>
+            <div class="item-subtotal">${{ item.subtotal | number:'1.0-0' }}</div>
+            <button class="remove-btn" (click)="eliminarDelCarrito(item.producto.id)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="carrito-vacio" *ngIf="carritoItems.length === 0">
+        <p>Tu carrito está vacío</p>
+      </div>
+
+      <!-- Selección de dirección y método de pago -->
+      <div class="checkout-section" *ngIf="carritoItems.length > 0">
+        <div class="form-group">
+          <label>Dirección de envío *</label>
+          <select class="form-select" [(ngModel)]="direccionSeleccionada" required>
+            <option [ngValue]="null">Selecciona una dirección</option>
+            <option *ngFor="let direccion of direcciones" [ngValue]="direccion.id">
+              {{ direccion.direccion }}, {{ direccion.ciudad }}, {{ direccion.departamento }}
+            </option>
+          </select>
+          <a routerLink="/profile" class="add-link" (click)="toggleCarritoModal()">Agregar dirección</a>
+        </div>
+
+        <div class="form-group">
+          <label>Método de pago *</label>
+          <select class="form-select" [(ngModel)]="metodoPagoSeleccionado" required>
+            <option [ngValue]="null">Selecciona un método de pago</option>
+            <option *ngFor="let metodo of metodosPago" [ngValue]="metodo.id">
+              {{ metodo.tipoTarjeta }} - ****{{ metodo.numeroTarjeta }}
+            </option>
+          </select>
+          <a routerLink="/profile" class="add-link" (click)="toggleCarritoModal()">Agregar método de pago</a>
+        </div>
+
+        <div class="total-section">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>${{ obtenerTotal() | number:'1.0-0' }}</span>
+          </div>
+          <div class="total-row total-final">
+            <span>Total:</span>
+            <span>${{ obtenerTotal() | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <button class="checkout-btn" 
+                (click)="finalizarCompra()" 
+                [disabled]="procesandoCompra || !direccionSeleccionada || !metodoPagoSeleccionado">
+          {{ procesandoCompra ? 'Procesando...' : 'Finalizar Compra' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Footer -->

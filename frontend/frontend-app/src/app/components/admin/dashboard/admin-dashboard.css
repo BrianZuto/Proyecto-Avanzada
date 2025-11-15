@@ -15,6 +15,18 @@
 .badge.ok { background: #d1fae5; color: #065f46; }
 .badge.warn { background: #fde68a; color: #92400e; }
 .badge.info { background: #dbeafe; color: #1e3a8a; }
+.badge.danger { background: #fee2e2; color: #991b1b; }
+
+.loading-state, .empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
 
 @media (max-width: 992px) { .metrics { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .metrics { grid-template-columns: 1fr; } .thead, .row { grid-template-columns: 1fr; } }

@@ -52,16 +52,17 @@ export class LoginComponent {
     this.error = '';
 
     this.authService.login(this.loginData.email, this.loginData.password).subscribe({
-      next: (success) => {
+      next: (result) => {
         this.loading = false;
-        if (success) {
+        if (result.success) {
           this.router.navigate(['/']);
         } else {
-          this.error = 'Credenciales incorrectas';
+          this.error = result.message || 'Credenciales incorrectas';
         }
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
+        console.error('Login error in component:', error);
         this.error = 'Error al iniciar sesión';
       }
     });
@@ -87,21 +88,30 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
 
+    console.log('Registrando usuario:', {
+      nombre: this.registerData.nombre,
+      email: this.registerData.email,
+      passwordLength: this.registerData.password.length
+    });
+
     this.authService.register(
       this.registerData.nombre,
       this.registerData.email,
       this.registerData.password
     ).subscribe({
-      next: (success) => {
+      next: (result) => {
         this.loading = false;
-        if (success) {
+        console.log('Register result:', result);
+        if (result.success) {
           this.router.navigate(['/']);
         } else {
-          this.error = 'Error al registrar usuario';
+          this.error = result.message || 'Error al registrar usuario';
+          console.error('Register failed:', this.error);
         }
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
+        console.error('Register error in component:', error);
         this.error = 'Error al registrar usuario';
       }
     });
