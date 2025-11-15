@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth';
 import { ProductoService } from '../../services/producto.service';
 import { CarritoService } from '../../services/carrito.service';
 import { MainLayoutComponent } from '../../layouts/main-layout/main-layout';
@@ -21,6 +22,7 @@ export class CatalogoComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private authService: AuthService,
     private productoService: ProductoService,
     private carritoService: CarritoService
   ) {}
@@ -85,6 +87,18 @@ export class CatalogoComponent implements OnInit {
   }
 
   agregarAlCarrito(producto: Producto): void {
+    if (!this.isLoggedIn()) {
+      (window as any).Swal.fire({
+        title: 'Inicia sesión',
+        text: 'Debes iniciar sesión para agregar productos al carrito',
+        icon: 'info',
+        confirmButtonText: 'Iniciar sesión'
+      }).then(() => {
+        this.router.navigate(['/login']);
+      });
+      return;
+    }
+
     if (producto.stock && producto.stock > 0) {
       this.carritoService.agregarProducto(producto, 1);
       (window as any).Swal.fire({
@@ -102,6 +116,10 @@ export class CatalogoComponent implements OnInit {
         confirmButtonText: 'Aceptar'
       });
     }
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
   }
 
   obtenerMarcasUnicas(): string[] {
