@@ -97,6 +97,18 @@ export class HomeComponent implements OnInit {
   }
 
   agregarAlCarrito(producto: Producto): void {
+    if (!this.isLoggedIn()) {
+      (window as any).Swal.fire({
+        title: 'Inicia sesión',
+        text: 'Debes iniciar sesión para agregar productos al carrito',
+        icon: 'info',
+        confirmButtonText: 'Iniciar sesión'
+      }).then(() => {
+        this.router.navigate(['/login']);
+      });
+      return;
+    }
+
     if (producto.stock && producto.stock > 0) {
       this.carritoService.agregarProducto(producto, 1);
       (window as any).Swal.fire({
@@ -114,6 +126,10 @@ export class HomeComponent implements OnInit {
         confirmButtonText: 'Aceptar'
       });
     }
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
   }
 
   explorarColeccion(): void {

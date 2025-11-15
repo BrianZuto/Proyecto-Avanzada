@@ -52,6 +52,7 @@
               </span>
             </div>
             <button class="product-btn" 
+                    *ngIf="isLoggedIn()"
                     (click)="agregarAlCarrito(producto)"
                     [disabled]="!producto.stock || producto.stock === 0">
               {{ producto.stock && producto.stock > 0 ? 'Agregar al carrito' : 'Agotado' }}

@@ -1,18 +1,19 @@
 package com.proyectoavanzada.backend.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import com.proyectoavanzada.backend.security.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import com.proyectoavanzada.backend.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -54,12 +55,28 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-resources/**").permitAll()
                 .requestMatchers("/webjars/**").permitAll()
                 
+                // Endpoints públicos de productos (GET para ver productos)
+                .requestMatchers("/api/productos").permitAll()
+                .requestMatchers("/api/productos/activos").permitAll()
+                .requestMatchers("/api/productos/{id}").permitAll()
+                .requestMatchers("/api/productos/codigo/**").permitAll()
+                .requestMatchers("/api/productos/buscar").permitAll()
+                .requestMatchers("/api/productos/categoria/**").permitAll()
+                .requestMatchers("/api/productos/marca/**").permitAll()
+                .requestMatchers("/api/productos/destacados").permitAll()
+                .requestMatchers("/api/productos/nuevos").permitAll()
+                .requestMatchers("/api/productos/con-descuento").permitAll()
+                .requestMatchers("/api/productos/rango-precio").permitAll()
+                .requestMatchers("/api/productos/ordenados-precio-asc").permitAll()
+                .requestMatchers("/api/productos/ordenados-precio-desc").permitAll()
+                .requestMatchers("/api/productos/verificar-codigo").permitAll()
+                
                 // Endpoints que requieren autenticación
                 .requestMatchers("/api/usuarios/**").authenticated()
                 .requestMatchers("/api/clientes/**").authenticated()
                 .requestMatchers("/api/categorias/**").authenticated()
                 .requestMatchers("/api/marcas/**").authenticated()
-                .requestMatchers("/api/productos/**").authenticated()
+                .requestMatchers("/api/productos/**").authenticated() // POST, PUT, DELETE requieren autenticación
                 .requestMatchers("/api/presentaciones/**").authenticated()
                 .requestMatchers("/api/proveedores/**").authenticated()
                 .requestMatchers("/api/compras/**").authenticated()
