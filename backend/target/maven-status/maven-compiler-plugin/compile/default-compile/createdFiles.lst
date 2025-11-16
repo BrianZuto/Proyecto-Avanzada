@@ -50,6 +50,7 @@ com\proyectoavanzada\backend\repository\DetalleVentaRepository.class
 com\proyectoavanzada\backend\model\Presentacion.class
 com\proyectoavanzada\backend\controller\ClienteController.class
 com\proyectoavanzada\backend\model\Cliente.class
+com\proyectoavanzada\backend\config\OpenApiConfig.class
 com\proyectoavanzada\backend\config\CorsConfig.class
 com\proyectoavanzada\backend\controller\CategoriaController.class
 com\proyectoavanzada\backend\model\Categoria.class
