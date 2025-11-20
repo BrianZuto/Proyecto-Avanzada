@@ -1,13 +1,128 @@
-# 🏪 Proyecto Avanzada - Sistema de Venta de Sneakers
+# 🏪 SneakerZone - Sistema de Venta de Sneakers
 
-## 📚 Información Académica
+## 📚 Información del Proyecto
 
 **Asignatura:** Programación Avanzada  
 **Estudiantes:** 
 - Brian Zuleta Tobón
 - Luis Torres
 
-Sistema completo de gestión de ventas de sneakers con **Angular** (Frontend) y **Spring Boot** (Backend), containerizado con **Docker**.
+**Versión:** 2.0.0  
+**Estado:** ✅ **Proyecto Completo - Backend y Frontend 100% Funcionales**
+
+Sistema completo de gestión de ventas de sneakers desarrollado con **Angular 20+** (Frontend) y **Spring Boot 3.x** (Backend), completamente containerizado con **Docker** y desplegado en producción.
+
+## 🚀 Tecnologías Utilizadas
+
+### Backend
+- **Java 17+** - Lenguaje de programación
+- **Spring Boot 3.x** - Framework principal
+- **Spring Security** - Autenticación y autorización
+- **JWT (JSON Web Tokens)** - Autenticación stateless
+- **Spring Data JPA** - Persistencia de datos
+- **MySQL 8.0** - Base de datos relacional
+- **Maven** - Gestión de dependencias
+- **JUnit 5** - Testing (107 tests implementados)
+- **Swagger/OpenAPI** - Documentación de API
+
+### Frontend
+- **Angular 20+** - Framework frontend
+- **TypeScript** - Lenguaje de programación
+- **RxJS** - Programación reactiva
+- **Bootstrap Icons** - Iconografía
+- **SweetAlert2** - Alertas y notificaciones
+- **jsPDF** - Generación de PDFs
+- **Angular Material** - Componentes UI
+
+### DevOps & Infraestructura
+- **Docker** - Containerización
+- **Docker Compose** - Orquestación de servicios
+- **Nginx** - Servidor web para frontend
+- **MySQL** - Base de datos
+- **phpMyAdmin** - Administración de BD
+
+## 📋 Características Principales
+
+### 🔐 Sistema de Autenticación
+- Registro de usuarios con validación
+- Login con JWT tokens
+- Roles de usuario (Admin, Empleado, Usuario)
+- Protección de rutas basada en roles
+- Gestión de sesiones
+- Recuperación de contraseña (estructura preparada)
+
+### 🛍️ Gestión de Productos
+- Catálogo completo de productos
+- Visualización pública (sin necesidad de login)
+- Filtros por marca y categoría
+- Búsqueda de productos
+- Gestión de stock en tiempo real
+- Imágenes de productos
+- Descuentos y ofertas
+- Productos destacados y nuevos
+
+### 🛒 Carrito de Compras
+- Agregar productos al carrito (requiere login)
+- Modificar cantidades
+- Eliminar productos
+- Cálculo automático de totales
+- Persistencia en sesión
+
+### 💳 Proceso de Compra
+- Selección de dirección de envío
+- Selección de método de pago
+- Gestión de múltiples direcciones
+- Gestión de métodos de pago
+- Cálculo de totales
+- Generación de comprobantes PDF
+- Historial de compras
+
+### 👤 Perfil de Usuario
+- Edición de información personal
+- Gestión de direcciones
+- Gestión de métodos de pago
+- Historial de compras
+- Visualización de pedidos
+
+### 👨‍💼 Panel de Administración
+- **Dashboard** con estadísticas en tiempo real
+- **Gestión de Productos**: CRUD completo
+- **Gestión de Ventas**: Visualización y detalles
+- **Gestión de Compras**: Control de inventario
+- **Gestión de Usuarios**: Administración de cuentas
+- **Reportes**: Generación de reportes de ventas
+- **Top Productos**: Productos más vendidos
+- **Exportación PDF**: Comprobantes de venta
+
+### 📊 Reportes y Estadísticas
+- Reportes de ventas
+- Estadísticas de productos
+- Análisis de compras
+- Top productos más vendidos
+- Métricas del dashboard
+
+## 🗄️ Base de Datos
+
+### Estructura Principal
+- **11 tablas principales** con relaciones bien definidas
+- **Scripts SQL organizados** en el directorio `database/`
+- **Documentación completa** en `database/README_SQL.txt`
+- **Datos de ejemplo** para desarrollo y testing
+
+### Tablas Principales
+- `usuarios` - Gestión de usuarios del sistema
+- `clientes` - Información de clientes
+- `productos` - Catálogo de productos
+- `categorias` - Categorías de productos
+- `marcas` - Marcas de productos
+- `inventario` - Control de stock
+- `compras` - Registro de compras a proveedores
+- `ventas` - Registro de ventas
+- `detalles_venta` - Detalles de productos en ventas
+- `direcciones` - Direcciones de envío
+- `metodos_pago` - Métodos de pago de usuarios
+
+> 📖 **Nota:** Para más información sobre la base de datos, consulta `database/README_SQL.txt`
 
 ## 🚀 Formas de Ejecutar el Proyecto
 
@@ -233,25 +348,66 @@ ProyectoAvanzada/
 └── docker-scripts/        # Scripts de utilidad
 ```
 
-## 🎯 Funcionalidades
+## 🎯 Funcionalidades Detalladas
 
-### ✅ Backend (Completo)
-- **107 tests JUnit** ejecutándose exitosamente
-- **CRUD completo** de clientes, productos, compras y ventas
-- **Sistema de autenticación** con JWT
-- **Reportes** en múltiples formatos
-- **API REST** con 100+ endpoints
+### ✅ Backend (100% Completo)
+- ✅ **107 tests JUnit** ejecutándose exitosamente
+- ✅ **API REST** con 100+ endpoints documentados
+- ✅ **CRUD completo** de todas las entidades:
+  - Usuarios y autenticación
+  - Clientes
+  - Productos con inventario
+  - Compras y proveedores
+  - Ventas y detalles
+  - Direcciones
+  - Métodos de pago
+- ✅ **Sistema de autenticación JWT** completo
+- ✅ **Autorización basada en roles** (Admin, Empleado, Usuario)
+- ✅ **Validación de datos** con Bean Validation
+- ✅ **Manejo de errores** centralizado
+- ✅ **CORS configurado** para desarrollo y producción
+- ✅ **Swagger/OpenAPI** para documentación interactiva
+- ✅ **Endpoints públicos** para visualización de productos
+- ✅ **Endpoints protegidos** para operaciones sensibles
 
-### ✅ Frontend (Completo)
-- **Angular 20+** con diseño moderno y responsivo
-- **Sistema de autenticación** completo (login, registro, perfil)
-- **Catálogo de productos** con filtros y búsqueda
-- **Carrito de compras** funcional
-- **Gestión de direcciones y métodos de pago**
-- **Proceso de compra** completo
-- **Panel de administración** para gestión de productos, usuarios y compras
-- **Visualización de productos** para usuarios logueados y no logueados
-- **Integración completa** con backend API
+### ✅ Frontend (100% Completo)
+- ✅ **Angular 20+** con arquitectura moderna
+- ✅ **Diseño responsivo** y adaptativo
+- ✅ **Sistema de autenticación completo**:
+  - Login y registro
+  - Gestión de sesión
+  - Protección de rutas
+  - Guards de autenticación
+- ✅ **Catálogo de productos**:
+  - Visualización pública (sin login requerido)
+  - Filtros por marca
+  - Búsqueda de productos
+  - Detalles de productos
+- ✅ **Carrito de compras**:
+  - Agregar productos (requiere login)
+  - Modificar cantidades
+  - Eliminar productos
+  - Cálculo de totales
+- ✅ **Proceso de compra completo**:
+  - Selección de dirección
+  - Selección de método de pago
+  - Confirmación de compra
+  - Generación de comprobante PDF
+- ✅ **Perfil de usuario**:
+  - Edición de datos personales
+  - Gestión de direcciones
+  - Gestión de métodos de pago
+  - Historial de compras
+- ✅ **Panel de administración**:
+  - Dashboard con estadísticas
+  - Gestión de productos
+  - Gestión de ventas
+  - Gestión de compras
+  - Gestión de usuarios
+  - Exportación de PDFs
+- ✅ **Integración completa** con backend API
+- ✅ **Manejo de errores** y notificaciones
+- ✅ **Loading states** y feedback visual
 
 ## 🛠️ Desarrollo
 
@@ -272,11 +428,58 @@ docker-compose up -d --build frontend
 
 ## 📊 Estado del Proyecto
 
-- ✅ **Backend:** 100% funcional con 107 tests pasando
-- ✅ **Frontend:** 100% completo y funcional
-- ✅ **Base de Datos:** Configurada con datos de ejemplo
-- ✅ **Docker:** Completamente containerizado
-- ✅ **Integración:** Frontend y Backend completamente integrados
+### ✅ Estado General: COMPLETO
+
+| Componente | Estado | Detalles |
+|------------|--------|----------|
+| **Backend** | ✅ 100% | 107 tests pasando, API completa |
+| **Frontend** | ✅ 100% | Todas las funcionalidades implementadas |
+| **Base de Datos** | ✅ 100% | Esquema completo con datos de ejemplo |
+| **Docker** | ✅ 100% | Containerización completa |
+| **Integración** | ✅ 100% | Frontend y Backend completamente integrados |
+| **Documentación** | ✅ 100% | README completo y documentación SQL |
+| **Despliegue** | ✅ 100% | Configurado para producción en VPS |
+
+### 📈 Métricas del Proyecto
+
+- **Líneas de código Backend:** ~15,000+
+- **Líneas de código Frontend:** ~10,000+
+- **Endpoints API:** 100+
+- **Tests Backend:** 107
+- **Componentes Angular:** 20+
+- **Tablas de Base de Datos:** 11
+- **Scripts SQL:** 11
+
+## 🚀 Despliegue en Producción
+
+El proyecto está configurado para despliegue en VPS con Docker:
+
+### Configuración de Producción
+- **Backend:** Configuración para producción en `application-prod.properties`
+- **Frontend:** Build optimizado para producción con Nginx
+- **Base de Datos:** MySQL 8.0 con persistencia de datos
+- **CORS:** Configurado para dominio de producción
+
+### Actualización en VPS
+```bash
+# Conectarse a la VPS
+ssh usuario@vps-ip
+
+# Navegar al proyecto
+cd /ruta/a/ProyectoAvanzada
+
+# Actualizar código
+git checkout main
+git pull origin main
+
+# Reconstruir contenedores
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+
+# Verificar estado
+docker-compose ps
+```
 
 ## 🐛 Solución de Problemas
 
@@ -370,11 +573,65 @@ taskkill /PID <PID> /F
 docker-compose up -d --scale backend=1 --scale frontend=1
 ```
 
-## 📞 Soporte
+## 📖 Documentación Adicional
 
-Para reportar problemas o solicitar nuevas funcionalidades, crea un issue en el repositorio del proyecto.
+### Base de Datos
+- **README_SQL.txt**: Documentación completa de scripts SQL
+- **Orden de ejecución**: Ver `database/README_SQL.txt`
+- **Estructura de tablas**: Documentada en scripts SQL
+
+### API Documentation
+- **Swagger UI**: Disponible en `http://localhost:8081/swagger-ui.html` (desarrollo)
+- **Endpoints públicos**: Productos visibles sin autenticación
+- **Endpoints protegidos**: Requieren JWT token
+
+### Arquitectura
+- **Backend**: Arquitectura en capas (Controller, Service, Repository)
+- **Frontend**: Arquitectura modular con componentes standalone
+- **Base de Datos**: Relaciones bien definidas con integridad referencial
+
+## 🔒 Seguridad
+
+- ✅ Autenticación JWT implementada
+- ✅ Contraseñas hasheadas con BCrypt
+- ✅ Protección de rutas en frontend y backend
+- ✅ Validación de datos en ambos extremos
+- ✅ CORS configurado correctamente
+- ✅ Endpoints sensibles protegidos
+- ✅ Endpoints públicos para productos (sin autenticación)
+
+## 📝 Notas de Desarrollo
+
+### Características Implementadas Recientemente
+- ✅ Visualización de productos para usuarios no logueados
+- ✅ Botón "Agregar al carrito" solo visible para usuarios logueados
+- ✅ Corrección de visualización de productos en ventas
+- ✅ Generación de PDFs de comprobantes
+- ✅ Panel de administración completo
+
+### Mejores Prácticas Aplicadas
+- ✅ Código limpio y bien estructurado
+- ✅ Separación de responsabilidades
+- ✅ Manejo de errores centralizado
+- ✅ Validación de datos
+- ✅ Documentación de código
+- ✅ Testing del backend
+- ✅ Containerización con Docker
+
+## 📞 Soporte y Contacto
+
+Para reportar problemas, solicitar nuevas funcionalidades o consultas:
+- Crear un issue en el repositorio del proyecto
+- Revisar la documentación en `database/README_SQL.txt`
+- Consultar la documentación de API en Swagger UI
+
+## 📄 Licencia
+
+Este proyecto fue desarrollado como parte del curso de Programación Avanzada.
 
 ---
 
-**Desarrollado con ❤️ usando Angular + Spring Boot + Docker**  
-**Versión:** 2.0.0 | **Estado:** ✅ Proyecto Completo - Backend y Frontend 100% Funcionales
+**Desarrollado con ❤️ por Brian Zuleta Tobón y Luis Torres**  
+**Tecnologías:** Angular 20+ | Spring Boot 3.x | MySQL 8.0 | Docker  
+**Versión:** 2.0.0 | **Estado:** ✅ Proyecto Completo y Funcional  
+**Fecha:** 2025
