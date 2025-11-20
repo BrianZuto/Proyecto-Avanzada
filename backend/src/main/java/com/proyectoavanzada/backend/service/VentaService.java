@@ -48,14 +48,44 @@ public class VentaService {
      * Obtener todas las ventas
      */
     public List<Venta> obtenerTodasLasVentas() {
-        return ventaRepository.findAll();
+        List<Venta> ventas = ventaRepository.findAll();
+        // Inicializar detalles de venta y productos
+        for (Venta venta : ventas) {
+            if (venta.getDetallesVenta() != null) {
+                venta.getDetallesVenta().size(); // Forzar carga de detalles
+                for (DetalleVenta detalle : venta.getDetallesVenta()) {
+                    if (detalle.getProducto() != null) {
+                        detalle.getProducto().getNombre(); // Forzar carga de producto
+                        if (detalle.getProducto().getMarca() != null) {
+                            detalle.getProducto().getMarca().getNombre(); // Forzar carga de marca
+                        }
+                    }
+                }
+            }
+        }
+        return ventas;
     }
     
     /**
      * Obtener todas las ventas activas
      */
     public List<Venta> obtenerVentasActivas() {
-        return ventaRepository.findByActivoTrue();
+        List<Venta> ventas = ventaRepository.findByActivoTrue();
+        // Inicializar detalles de venta y productos
+        for (Venta venta : ventas) {
+            if (venta.getDetallesVenta() != null) {
+                venta.getDetallesVenta().size(); // Forzar carga de detalles
+                for (DetalleVenta detalle : venta.getDetallesVenta()) {
+                    if (detalle.getProducto() != null) {
+                        detalle.getProducto().getNombre(); // Forzar carga de producto
+                        if (detalle.getProducto().getMarca() != null) {
+                            detalle.getProducto().getMarca().getNombre(); // Forzar carga de marca
+                        }
+                    }
+                }
+            }
+        }
+        return ventas;
     }
     
     /**
@@ -83,7 +113,22 @@ public class VentaService {
      * Obtener ventas por usuario vendedor
      */
     public List<Venta> obtenerVentasPorUsuario(Usuario usuario) {
-        return ventaRepository.findByUsuario(usuario);
+        List<Venta> ventas = ventaRepository.findByUsuario(usuario);
+        // Inicializar detalles de venta y productos
+        for (Venta venta : ventas) {
+            if (venta.getDetallesVenta() != null) {
+                venta.getDetallesVenta().size(); // Forzar carga de detalles
+                for (DetalleVenta detalle : venta.getDetallesVenta()) {
+                    if (detalle.getProducto() != null) {
+                        detalle.getProducto().getNombre(); // Forzar carga de producto
+                        if (detalle.getProducto().getMarca() != null) {
+                            detalle.getProducto().getMarca().getNombre(); // Forzar carga de marca
+                        }
+                    }
+                }
+            }
+        }
+        return ventas;
     }
     
     /**
